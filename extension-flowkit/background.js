@@ -8,6 +8,7 @@ importScripts('background_requests.js', 'background_telemetry.js', 'background_m
 
 const AGENT_WS_URL = 'ws://127.0.0.1:9222';
 const AGENT_WS_PROBE_URL = 'http://127.0.0.1:9222/';
+const API_BASE = 'http://127.0.0.1:8100';
 const NOTEBOOKLM_URL = 'https://notebooklm.google.com/';
 const NOTEBOOKLM_URL_PATTERNS = ['https://notebooklm.google.com/*'];
 
@@ -471,3 +472,5 @@ function sleep(ms) {
 // ─── Human-like Telemetry ──────────────────────────────────
 // Periodically send tracking events to Google's analytics endpoints
 // to mimic normal browser behavior.
+
+importScripts('background_agent_chat.js');

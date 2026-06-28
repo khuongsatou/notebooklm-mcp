@@ -13,10 +13,15 @@
     "http://127.0.0.1:8100/*",
     "http://127.0.0.1:9222/*",
     "http://127.0.0.1:20128/*",
-    "https://*.1nutrouter.com/*"
+    "http://127.0.0.1:*/*",
+    "http://localhost:*/*",
+    "https://*.1nutrouter.com/*",
+    "https://api.duckduckgo.com/*",
+    "https://api.openai.com/*",
+    "https://openrouter.ai/*"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://127.0.0.1:8100 http://127.0.0.1:9222 http://127.0.0.1:20128 ws://127.0.0.1:9222 https://*.1nutrouter.com https://notebooklm.google.com https://labs.google https://aisandbox-pa.googleapis.com https://flow-content.google https://storage.googleapis.com;"
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://127.0.0.1:* http://localhost:* ws://127.0.0.1:9222 https://*.1nutrouter.com https://api.duckduckgo.com https://api.openai.com https://openrouter.ai https://notebooklm.google.com https://labs.google https://aisandbox-pa.googleapis.com https://flow-content.google https://storage.googleapis.com;"
   },
   "background": {
     "service_worker": "background.js"

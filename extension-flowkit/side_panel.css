@@ -1,3 +1,4 @@
 @import './side_panel_styles/base.css';
 @import './side_panel_styles/chat.css';
 @import './side_panel_styles/details.css';
+@import './side_panel_styles/agent_chat.css';

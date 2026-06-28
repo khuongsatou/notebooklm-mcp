@@ -32,6 +32,7 @@ Thumbs.db
 *.log
 npm-debug.log*
 screenshots/
+workspace/ui-test-screenshots/
 
 # Archives / local notes
 *.tar.gz
@@ -48,3 +49,4 @@ venv/
 .playwright-mcp/
 tmp/
 studio-*.png
+release/

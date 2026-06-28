@@ -1,0 +1,188 @@
+{
+  "generatedAt": "2026-06-28T16:36:22.866Z",
+  "counts": {
+    "PASS": 17,
+    "SKIP": 6
+  },
+  "report": [
+    {
+      "name": "bridge.start",
+      "status": "PASS",
+      "ms": 3,
+      "details": {
+        "url": "http://127.0.0.1:52090"
+      }
+    },
+    {
+      "name": "api.info",
+      "status": "PASS",
+      "ms": 6,
+      "details": {
+        "version": "2.0.0"
+      }
+    },
+    {
+      "name": "settings.get",
+      "status": "PASS",
+      "ms": 2,
+      "details": {
+        "hasProviderApiKey": false
+      }
+    },
+    {
+      "name": "settings.patch",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "defaultSourceFormat": "footnotes",
+        "agentMaxLoops": 3
+      }
+    },
+    {
+      "name": "logs.write/list/clear",
+      "status": "PASS",
+      "ms": 3,
+      "details": {
+        "cleared": true
+      }
+    },
+    {
+      "name": "events.sse",
+      "status": "PASS",
+      "ms": 102,
+      "details": {
+        "ok": true
+      }
+    },
+    {
+      "name": "mcp.health",
+      "status": "PASS",
+      "ms": 728,
+      "details": {
+        "authenticated": false,
+        "sessions": 0
+      }
+    },
+    {
+      "name": "mcp.tools",
+      "status": "PASS",
+      "ms": 3,
+      "details": {
+        "count": 20
+      }
+    },
+    {
+      "name": "notebooks.list",
+      "status": "PASS",
+      "ms": 5,
+      "details": {
+        "count": 0
+      }
+    },
+    {
+      "name": "sessions.list",
+      "status": "PASS",
+      "ms": 3,
+      "details": {
+        "count": 0
+      }
+    },
+    {
+      "name": "auth.system_profile.dry_run",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "cmd": "open",
+        "args": [
+          "-na",
+          "Google Chrome",
+          "--args",
+          "--profile-directory=Profile 1",
+          "https://notebooklm.google.com/"
+        ]
+      }
+    },
+    {
+      "name": "content.questions.list_read",
+      "status": "PASS",
+      "ms": 13,
+      "details": {
+        "count": 33,
+        "sample": "không nên làm/Deep dive 01 - Không nên làm - Tư duy đạo diễn AI.json",
+        "bytes": 1000
+      }
+    },
+    {
+      "name": "content.workspace.list_read",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "count": 4,
+        "sample": "chapter/1.txt",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "updates.check.no_repo",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "message": "No update repo configured."
+      }
+    },
+    {
+      "name": "agent.config",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "toolCount": 11
+      }
+    },
+    {
+      "name": "agent.provider_test_expected_fail",
+      "status": "PASS",
+      "ms": 15,
+      "details": {
+        "handledError": "fetch failed"
+      }
+    },
+    {
+      "name": "package.artifact",
+      "status": "PASS",
+      "ms": 1,
+      "details": {
+        "artifact": "NotebookLM-MCP-Desktop-2.0.0-darwin-arm64"
+      }
+    },
+    {
+      "name": "auth.setup",
+      "status": "SKIP",
+      "reason": "Interactive Google login required; validate manually via Connect/Setup Auth in Electron UI."
+    },
+    {
+      "name": "ask.validate",
+      "status": "SKIP",
+      "reason": "Requires authenticated NotebookLM account and active notebook."
+    },
+    {
+      "name": "sources.add",
+      "status": "SKIP",
+      "reason": "Requires authenticated NotebookLM account and target notebook."
+    },
+    {
+      "name": "audio.generate/status/download",
+      "status": "SKIP",
+      "reason": "Requires authenticated NotebookLM account and notebook with sources."
+    },
+    {
+      "name": "agent.chat.real_llm",
+      "status": "SKIP",
+      "reason": "Requires configured OpenAI-compatible provider key/base URL."
+    },
+    {
+      "name": "electron.visual_ui",
+      "status": "SKIP",
+      "reason": "Requires manual GUI review with npm run desktop."
+    }
+  ]
+}

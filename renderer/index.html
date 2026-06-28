@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NotebookLM MCP Desktop</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="loading" class="loading">
+      <div class="loading-card">
+        <div class="brand-mark">NB</div>
+        <div>
+          <strong>NotebookLM MCP</strong>
+          <span>Starting desktop bridge...</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="app-shell">
+      <header class="app-header">
+        <div class="brand">
+          <span class="brand-mark">NB</span>
+          <div>
+            <h1>NotebookLM MCP</h1>
+            <p>Desktop bridge · research · validate · audio</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="connectBtn" class="status-pill primary" title="Connect NotebookLM">🔌 Connect</button>
+          <span id="connectStatus" class="connection-status is-unknown" title="Connection status" aria-live="polite">
+            <span class="connection-status-dot" aria-hidden="true"></span>
+            <span id="connectStatusLabel">Unknown</span>
+          </span>
+          <button id="bridgeBtn" class="status-pill" title="Open bridge API">🌐 API</button>
+          <button id="versionBtn" class="version-pill" title="Version and updates">v—</button>
+        </div>
+      </header>
+
+      <section class="metrics">
+        <button class="metric" data-view="notebooks" title="Notebook library"><span>📚</span><b id="metricNotebooks">0</b><small>Notebooks</small></button>
+        <button class="metric" data-view="sessions" title="Active sessions"><span>🧠</span><b id="metricSessions">0</b><small>Sessions</small></button>
+        <button class="metric" data-view="logs" title="Errors"><span>⚠</span><b id="metricErrors">0</b><small>Errors</small></button>
+        <button class="metric active" data-view="dashboard" title="Authentication"><span id="authIcon">○</span><b id="metricAuth">Unknown</b><small>Auth</small></button>
+      </section>
+
+      <nav class="tabs">
+        <button class="tab active" data-view="dashboard" title="Dashboard">⌂</button>
+        <button class="tab" data-view="notebooks" title="Notebooks">📚</button>
+        <button class="tab" data-view="ask" title="Ask and validate">✅</button>
+        <button class="tab" data-view="sources" title="Sources">＋</button>
+        <button class="tab" data-view="audio" title="Audio Overview">◉</button>
+        <button class="tab" data-view="sessions" title="Sessions">🧠</button>
+        <button class="tab" data-view="questions" title="Questions">?</button>
+        <button class="tab" data-view="workspace" title="Workspace">▣</button>
+        <button class="tab" data-view="agent" title="Agent Chat">AI</button>
+        <button class="tab" data-view="logs" title="Logs">≡</button>
+        <button class="tab" data-view="settings" title="Settings">⚙</button>
+      </nav>
+
+      <div id="appNotice" class="app-notice" hidden></div>
+
+      <section id="view-dashboard" class="view active">
+        <div class="grid two">
+          <article class="panel">
+            <div class="panel-title"><span>🔌 NotebookLM</span><button id="refreshHealthBtn" class="icon-btn" title="Refresh">↻</button></div>
+            <div class="status-grid">
+              <div><small>Bridge</small><strong id="bridgeStatus">Starting</strong></div>
+              <div><small>MCP</small><strong id="mcpStatus">Unknown</strong></div>
+              <div><small>Active notebook</small><strong id="activeNotebook">—</strong></div>
+              <div><small>Account</small><strong id="authStatus">—</strong></div>
+            </div>
+            <div class="button-row">
+              <button id="setupAuthBtn" class="btn-primary" title="Setup NotebookLM auth">🔐</button>
+              <button id="reauthBtn" class="btn-secondary" title="Re-auth">♻</button>
+              <button id="loadNotebooksBtn" class="btn-secondary" title="Load notebooks">📚</button>
+              <button id="loadSessionsBtn" class="btn-secondary" title="Load sessions">🧠</button>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span>⚡ Quick Validate</span><button class="icon-btn" data-view-jump="ask" title="Open Ask">›</button></div>
+            <label class="field compact"><span>Question</span><textarea id="quickQuestion" rows="4" placeholder="Nhập câu hỏi cần validate với NotebookLM..."></textarea></label>
+            <div class="button-row">
+              <button id="quickAskBtn" class="btn-primary">✅ Ask</button>
+              <select id="quickSourceFormat">
+                <option value="none">No citations</option>
+                <option value="footnotes">Footnotes</option>
+                <option value="inline">Inline</option>
+                <option value="json">JSON sources</option>
+              </select>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-notebooks" class="view">
+        <div class="grid two">
+          <article class="panel">
+            <div class="panel-title"><span>📚 Library</span><button id="reloadNotebooksBtn" class="icon-btn">↻</button></div>
+            <div id="notebookList" class="list empty">No notebooks loaded</div>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span>＋ Add Notebook</span></div>
+            <label class="field"><span>URL</span><input id="notebookUrl" placeholder="https://notebooklm.google.com/notebook/..." /></label>
+            <label class="field"><span>Name</span><input id="notebookName" placeholder="Research notebook" /></label>
+            <label class="field"><span>Description</span><textarea id="notebookDescription" rows="3" placeholder="Nội dung notebook"></textarea></label>
+            <label class="field"><span>Topics</span><input id="notebookTopics" placeholder="topic 1, topic 2" /></label>
+            <button id="addNotebookBtn" class="btn-primary">＋ Add</button>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-ask" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>✅ Ask & Validate</span><button id="copyAnswerBtn" class="icon-btn">📋</button></div>
+          <div class="form-grid">
+            <label class="field"><span>Notebook</span><select id="askNotebook"><option value="">Active notebook</option></select></label>
+            <label class="field"><span>Citations</span><select id="askSourceFormat"><option value="none">None</option><option value="footnotes">Footnotes</option><option value="inline">Inline</option><option value="json">JSON</option></select></label>
+            <label class="field check"><input id="askShowBrowser" type="checkbox" checked /> Visible browser</label>
+          </div>
+          <label class="field"><span>Question</span><textarea id="askQuestion" rows="5" placeholder="Hỏi NotebookLM..."></textarea></label>
+          <button id="askBtn" class="btn-primary">▶ Ask</button>
+          <div id="answerBox" class="answer-box">Answer will appear here.</div>
+        </article>
+      </section>
+
+      <section id="view-sources" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>＋ Sources</span></div>
+          <div class="form-grid">
+            <label class="field"><span>Notebook</span><select id="sourceNotebook"><option value="">Active notebook</option></select></label>
+            <label class="field"><span>Type</span><select id="sourceType"><option value="url">URL</option><option value="text">Text</option></select></label>
+          </div>
+          <label class="field"><span>Title</span><input id="sourceTitle" placeholder="Optional title" /></label>
+          <label class="field"><span>Content</span><textarea id="sourceContent" rows="8" placeholder="URL hoặc text source"></textarea></label>
+          <button id="addSourceBtn" class="btn-primary">＋ Add Source</button>
+          <div id="sourceResult" class="answer-box compact">No source action yet.</div>
+        </article>
+      </section>
+
+      <section id="view-audio" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>◉ Audio Overview</span></div>
+          <div class="form-grid">
+            <label class="field"><span>Notebook</span><select id="audioNotebook"><option value="">Active notebook</option></select></label>
+            <label class="field"><span>Mode</span><select id="audioMode"><option value="start">Start async</option><option value="wait">Wait for completion</option><option value="status">Check status</option><option value="download">Download</option></select></label>
+          </div>
+          <label class="field"><span>Custom Prompt</span><textarea id="audioPrompt" rows="3" placeholder="Optional audio prompt"></textarea></label>
+          <label class="field"><span>Destination</span><div class="inline-control"><input id="audioDestination" placeholder="/Users/.../Downloads" /><button id="chooseAudioDirBtn" class="icon-btn">📂</button></div></label>
+          <button id="audioRunBtn" class="btn-primary">▶ Run</button>
+          <div id="audioResult" class="answer-box compact">No audio action yet.</div>
+        </article>
+      </section>
+
+      <section id="view-sessions" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>🧠 Sessions</span><button id="reloadSessionsBtn" class="icon-btn">↻</button></div>
+          <div id="sessionList" class="list empty">No sessions loaded</div>
+        </article>
+      </section>
+
+      <section id="view-questions" class="view">
+        <article class="panel content-panel">
+          <div class="panel-title">
+            <span>? Questions</span>
+            <div><button id="reloadQuestionsBtn" class="icon-btn">↻</button><button id="copyQuestionBtn" class="icon-btn">📋</button></div>
+          </div>
+          <div class="content-layout">
+            <aside>
+              <input id="questionSearch" placeholder="Search questions..." />
+              <div id="questionFiles" class="content-list"></div>
+            </aside>
+            <main id="questionViewer" class="content-viewer">Select a question file.</main>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-workspace" class="view">
+        <article class="panel content-panel">
+          <div class="panel-title">
+            <span>▣ Workspace</span>
+            <div><button id="reloadWorkspaceBtn" class="icon-btn">↻</button><button id="copyWorkspaceBtn" class="icon-btn">📋</button></div>
+          </div>
+          <div class="content-layout">
+            <aside>
+              <input id="workspaceSearch" placeholder="Search workspace..." />
+              <div id="workspaceFiles" class="content-list"></div>
+            </aside>
+            <main id="workspaceViewer" class="content-viewer">Select a workspace file.</main>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-agent" class="view">
+        <article class="panel agent-panel">
+          <div class="panel-title"><span>AI Agent Chat</span><button id="copyAgentBtn" class="icon-btn">📋</button></div>
+          <div id="agentToolStrip" class="chip-row"></div>
+          <div class="context-line"><span id="agentContextLabel">Context 0 / 0</span><div><span id="agentContextBar"></span></div></div>
+          <div id="agentMessages" class="agent-messages"></div>
+          <div class="chat-input-row">
+            <textarea id="agentInput" rows="2" placeholder="Ra lệnh tự nhiên cho agent... Enter để gửi"></textarea>
+            <button id="agentSendBtn" class="btn-primary">Send</button>
+          </div>
+        </article>
+      </section>
+
+      <section id="view-logs" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>≡ Logs</span><div><button id="reloadLogsBtn" class="icon-btn">↻</button><button id="clearLogsBtn" class="icon-btn">🧹</button></div></div>
+          <div class="log-toolbar">
+            <select id="logLevel"><option value="all">All</option><option value="info">Info</option><option value="warn">Warn</option><option value="error">Error</option></select>
+            <input id="logQuery" placeholder="Search logs..." />
+          </div>
+          <div id="logList" class="log-list"></div>
+        </article>
+      </section>
+
+      <section id="view-settings" class="view">
+        <article class="panel">
+          <div class="panel-title"><span>⚙ Settings</span><button id="saveSettingsBtn" class="icon-btn">💾</button></div>
+          <div class="settings-grid">
+            <label class="field"><span>Bridge Host</span><input id="setBridgeHost" /></label>
+            <label class="field"><span>Bridge Port</span><input id="setBridgePort" type="number" /></label>
+            <label class="field"><span>MCP Port</span><input id="setMcpPort" type="number" /></label>
+            <label class="field"><span>Connect</span><select id="setConnectMode"><option value="systemChrome">System Chrome</option><option value="mcpAuth">MCP Auth</option></select></label>
+            <label class="field"><span>Chrome Profile</span><select id="setChromeProfileDirectory"><option value="">Active Profile</option><option value="Default">Default</option><option value="Profile 1">Profile 1</option><option value="Profile 2">Profile 2</option><option value="Profile 3">Profile 3</option><option value="Profile 4">Profile 4</option></select></label>
+            <label class="field"><span>Browser</span><select id="setBrowserMode"><option value="visible">Visible</option><option value="headless">Headless</option></select></label>
+            <label class="field"><span>Source Format</span><select id="setSourceFormat"><option value="none">None</option><option value="footnotes">Footnotes</option><option value="inline">Inline</option><option value="json">JSON</option></select></label>
+            <label class="field"><span>Provider Base</span><input id="setProviderBase" /></label>
+            <label class="field"><span>Provider Model</span><input id="setProviderModel" /></label>
+            <label class="field"><span>Provider Key</span><input id="setProviderKey" type="password" placeholder="Leave blank to keep current" /></label>
+            <label class="field"><span>Agent Loops</span><input id="setAgentLoops" type="number" min="1" max="12" /></label>
+            <label class="field"><span>Context Limit</span><input id="setContextLimit" type="number" /></label>
+            <label class="field"><span>Update Repo</span><input id="setUpdateRepo" placeholder="owner/repo" /></label>
+          </div>
+          <div id="settingsStatus" class="answer-box compact">Settings ready.</div>
+        </article>
+      </section>
+    </main>
+
+    <div id="modalBackdrop" class="modal-backdrop" hidden>
+      <section class="modal">
+        <div class="modal-head"><span>Version & Update</span><button id="closeModalBtn" class="icon-btn">×</button></div>
+        <div id="versionContent" class="modal-body"></div>
+        <div class="button-row"><button id="checkUpdateBtn" class="btn-primary">↻ Check Update</button><button id="copyDiagBtn" class="btn-secondary">📋 Copy Diagnostics</button></div>
+      </section>
+    </div>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>

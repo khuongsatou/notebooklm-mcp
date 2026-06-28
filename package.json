@@ -17,7 +17,12 @@
     "lint:fix": "eslint src --fix",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "check": "npm run format:check && npm run lint && npm run build"
+    "check": "npm run format:check && npm run lint && npm run build",
+    "desktop": "node scripts/start-electron.cjs",
+    "desktop:no-build": "node scripts/start-electron.cjs --no-build",
+    "check:desktop": "node --check electron.cjs && node --check preload.cjs && node --check lib/desktop-app-info.cjs && node --check lib/desktop-settings.cjs && node --check lib/desktop-credential-store.cjs && node --check lib/notebook-log-manager.cjs && node --check lib/notebook-socket-hub.cjs && node --check lib/notebook-mcp-adapter.cjs && node --check lib/notebook-update-client.cjs && node --check lib/notebook-bridge-server.cjs && node --check lib/agent-tools.cjs && node --check lib/agent-chat.cjs && node --check renderer/renderer.js && node --check scripts/start-electron.cjs && node --check scripts/package-app.cjs && node --check scripts/smoke-desktop.cjs",
+    "package": "node scripts/package-app.cjs",
+    "smoke:desktop": "node scripts/smoke-desktop.cjs"
   },
   "keywords": [
     "mcp",
@@ -58,9 +63,12 @@
     "prettier": "^3.8.3",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
-    "typescript-eslint": "^8.59.1"
+    "typescript-eslint": "^8.59.1",
+    "electron": "37.10.3"
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "productName": "NotebookLM MCP Desktop",
+  "main": "electron.cjs"
 }

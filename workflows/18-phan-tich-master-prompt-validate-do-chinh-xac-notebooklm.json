@@ -1,0 +1,162 @@
+{
+  "name": "18. Phan tich master prompt va validate do chinh xac bang NotebookLM",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "master_prompt"
+            },
+            {
+              "name": "master_prompt_path"
+            },
+            {
+              "name": "research_pack"
+            },
+            {
+              "name": "research_pack_path"
+            },
+            {
+              "name": "content_skeleton"
+            },
+            {
+              "name": "content_skeleton_path"
+            },
+            {
+              "name": "competitor_analysis"
+            },
+            {
+              "name": "competitor_analysis_path"
+            },
+            {
+              "name": "transcript"
+            },
+            {
+              "name": "source_bundle"
+            },
+            {
+              "name": "source_url"
+            },
+            {
+              "name": "source_type"
+            },
+            {
+              "name": "title"
+            },
+            {
+              "name": "validation_goal"
+            },
+            {
+              "name": "question_pack_json"
+            },
+            {
+              "name": "question_pack_path"
+            },
+            {
+              "name": "notebook_id"
+            },
+            {
+              "name": "notebook_url"
+            },
+            {
+              "name": "notebooklm_session_id"
+            },
+            {
+              "name": "mcp_base_url"
+            },
+            {
+              "name": "source_format"
+            },
+            {
+              "name": "add_source"
+            },
+            {
+              "name": "wait_after_upload_ms"
+            },
+            {
+              "name": "show_browser"
+            },
+            {
+              "name": "keep_mcp_session"
+            }
+          ]
+        }
+      },
+      "id": "06421a60-4e44-4b16-b4bc-1f80f8a8270f",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Workflow con: Master prompt accuracy validation\n\nChay MCP server truoc:\n`cd /Users/apple/Desktop/ex_project_8/mtips5s_mcp_ml && npm run build && node dist/index.js --transport http --port 3000 --host 127.0.0.1`\n\nInput toi thieu:\n- `master_prompt`: ban master prompt can validate\n- `research_pack` / `content_skeleton` / `competitor_analysis`: nguon doi chieu\n- `notebook_id` hoac `notebook_url`: notebook dich\n\nNeu dung `*_path`, n8n Code node can doc duoc `node:fs/promises`. Neu moi truong chan fs, hay truyen thang text vao cac input tuong ung.\n\nOutput chinh:\n- `answer`: verdict va phan tich cua NotebookLM\n- `citations`: nguon/citation neu `source_format=json`\n- `validation_prompt`: prompt da gui vao NotebookLM\n- `source_added`: ket qua nap source vao notebook",
+        "height": 380,
+        "width": 540,
+        "color": 5
+      },
+      "id": "cf1a7c29-cf0c-4b8d-a44a-4df47c34db79",
+      "name": "Usage Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        -380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconst defaultQuestions = [\n  'Master prompt co xac dinh ro audience, market/language va viewer intent khong?',\n  'Master prompt co phan biet keyword intent voi viewer intent khong?',\n  'Research pack co du bang chung de support cac claim trong master prompt khong?',\n  'Master prompt co khoa duoc content format, viewer experience va mission khong?',\n  'Subject type va subject topic co cu the, co can cu, va khong bi qua rong khong?',\n  'Master prompt co bien research thanh content skeleton, script skeleton, scene split, image prompt va video prompt theo dung thu tu khong?',\n  'Cac quy tac prompt anh co du subject details, environment lock, camera/lens va action cue khong?',\n  'Cac quy tac prompt video co motion logic, action timing, consistency lock va audio/emotion cue khong?',\n  'Co claim nao trong master prompt chua duoc nguon ho tro, dang suy luan qua muc, hoac can research them khong?',\n  'Co contradiction nao giua master prompt, research pack, competitor analysis va content skeleton khong?',\n  'Master prompt co rui ro ve IP, policy, factual accuracy, medical/finance/legal claim hoac hinh anh can do chinh xac cao khong?',\n  'Prompt co tao du dieu kien de validate 1 tap/1 section mau truoc khi batch khong?',\n  'Neu phai cho diem do chinh xac va san sang san xuat, diem 0-100 la bao nhieu va vi sao?',\n  'Can sua phan nao trong master prompt truoc khi dung de sinh script/image/video prompt?'\n];\n\nlet mcpBaseUrl = String(input.mcp_base_url || input.mcpUrl || 'http://127.0.0.1:3000/mcp').replace(/\\/$/, '');\nif (mcpBaseUrl.startsWith('http') && !mcpBaseUrl.endsWith('/mcp')) mcpBaseUrl = `${mcpBaseUrl}/mcp`;\nif (!mcpBaseUrl.startsWith('http')) {\n  throw new Error('mcp_base_url must be an HTTP URL, for example http://127.0.0.1:3000/mcp');\n}\n\nconst sourceFormat = String(input.source_format || 'json');\nconst waitAfterUploadMs = Number(input.wait_after_upload_ms ?? 15000);\nconst showBrowser = input.show_browser === true || input.show_browser === 'true';\n\nasync function maybeReadFile(pathValue) {\n  const filePath = String(pathValue || '').trim();\n  if (!filePath) return '';\n\n  try {\n    const fs = await import('node:fs/promises');\n    return await fs.readFile(filePath, 'utf8');\n  } catch (error) {\n    throw new Error(`Could not read file path \"${filePath}\". Pass the file content directly instead, or allow node:fs/promises in the n8n Code node. Original error: ${error.message}`);\n  }\n}\n\nfunction parseQuestionPack(value, label) {\n  if (!value) return [];\n  let parsed = value;\n  if (typeof value === 'string') {\n    try {\n      parsed = JSON.parse(value);\n    } catch (error) {\n      throw new Error(`${label} is not valid JSON: ${error.message}`);\n    }\n  }\n  if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);\n  if (Array.isArray(parsed.question)) return parsed.question.map(String).filter(Boolean);\n  if (Array.isArray(parsed.questions)) return parsed.questions.map(String).filter(Boolean);\n  throw new Error(`${label} must be an array or an object with question/questions array`);\n}\n\nfunction section(title, body) {\n  const text = String(body || '').trim();\n  return text ? `\\n\\n# ${title}\\n${text}` : '';\n}\n\nconst fileInputs = {\n  masterPrompt: await maybeReadFile(input.master_prompt_path),\n  researchPack: await maybeReadFile(input.research_pack_path),\n  contentSkeleton: await maybeReadFile(input.content_skeleton_path),\n  competitorAnalysis: await maybeReadFile(input.competitor_analysis_path),\n  questionPack: await maybeReadFile(input.question_pack_path),\n};\n\nlet questions = defaultQuestions;\nif (input.question_pack_json || fileInputs.questionPack) {\n  questions = parseQuestionPack(input.question_pack_json || fileInputs.questionPack, 'question_pack');\n}\n\nconst sourceText = String(input.source_bundle || '').trim() || [\n  section('MASTER PROMPT CAN VALIDATE', input.master_prompt || fileInputs.masterPrompt),\n  section('RESEARCH PACK / SOURCE OF TRUTH', input.research_pack || fileInputs.researchPack),\n  section('CONTENT SKELETON', input.content_skeleton || fileInputs.contentSkeleton),\n  section('COMPETITOR ANALYSIS', input.competitor_analysis || fileInputs.competitorAnalysis),\n  section('TRANSCRIPT / LESSON NOTES', input.transcript),\n].join('').trim();\n\nconst sourceUrl = String(input.source_url || input.url || '').trim();\nconst shouldAddSource = input.add_source !== false && input.add_source !== 'false' && Boolean(sourceText || sourceUrl);\n\nfunction notebookTarget(extra = {}) {\n  const target = { ...extra };\n  if (input.notebook_id) target.notebook_id = input.notebook_id;\n  if (input.notebook_url) target.notebook_url = input.notebook_url;\n  if (input.notebooklm_session_id) target.session_id = input.notebooklm_session_id;\n  if (showBrowser) target.show_browser = true;\n  return target;\n}\n\nfunction buildValidationPrompt() {\n  const title = input.title ? `\\nTen goi: ${input.title}` : '';\n  const goal = input.validation_goal ? `\\nMuc tieu validate: ${input.validation_goal}` : '';\n  const numberedQuestions = questions.map((q, index) => `${index + 1}. ${q}`).join('\\n');\n\n  return [\n    'Hay dong vai tro reviewer K07, dung NotebookLM de phan tich master prompt va validate do chinh xac dua tren cac nguon trong notebook.',\n    'Tra loi bang tieng Viet. Phan biet ro: du kien co bang chung tu nguon, suy luan hop ly, va diem chua du nguon. Khong bia so lieu, case study, doi thu, hay ket luan neu nguon khong noi.',\n    title + goal,\n    '',\n    'Bat buoc tra ve dung cac muc sau:',\n    '1. Verdict: PASS / PARTIAL / FAIL, kem 1 doan ly do ngan.',\n    '2. Accuracy score 0-100 va confidence Low/Medium/High.',\n    '3. Evidence map: claim quan trong trong master prompt -> bang chung/citation -> trang thai Supported/Weak/Unsupported/Contradicted.',\n    '4. Missing source list: nhung thong tin can nap them vao NotebookLM truoc khi ket luan chac.',\n    '5. Research validation: audience, viewer intent, competitor pattern, format co view, comment insight, micro-niche gap, search intent vs viewer intent.',\n    '6. Production validation: master prompt co du de di tiep sang script skeleton, scene split, image prompt, video prompt, QA gate va batch rule khong.',\n    '7. Risk register: factual accuracy, IP/policy, topic too broad, AI visual feasibility, format drift, unsupported claim.',\n    '8. Required fixes: sua truc tiep theo thu tu uu tien P0/P1/P2.',\n    '9. Revised master prompt patch: chi viet cac block can them/sua, khong viet lai toan bo neu khong can.',\n    '10. Next NotebookLM questions: 5-10 cau hoi tiep theo de lam sau neu chua du bang chung.',\n    '',\n    'Bo cau hoi validate:',\n    numberedQuestions,\n  ].join('\\n');\n}\n\nfunction parseMcpHttpPayload(rawText, status) {\n  const trimmed = rawText.trim();\n  if (!trimmed) return null;\n\n  try {\n    return JSON.parse(trimmed);\n  } catch {\n    // Streamable HTTP may answer POST as server-sent events.\n  }\n\n  const dataLines = [];\n  for (const line of trimmed.split(/\\r?\\n/)) {\n    if (line.startsWith('data:')) dataLines.push(line.slice(5).trimStart());\n  }\n\n  if (dataLines.length > 0) {\n    const data = dataLines.join('\\n');\n    try {\n      return JSON.parse(data);\n    } catch {\n      throw new Error(`MCP returned invalid SSE JSON (${status}): ${data.slice(0, 500)}`);\n    }\n  }\n\n  throw new Error(`MCP returned non-JSON response (${status}): ${rawText.slice(0, 500)}`);\n}\n\nasync function rpc(body, mcpSessionId) {\n  const headers = {\n    accept: 'application/json, text/event-stream',\n    'content-type': 'application/json',\n  };\n  if (mcpSessionId) headers['Mcp-Session-Id'] = mcpSessionId;\n\n  const response = await fetch(mcpBaseUrl, {\n    method: 'POST',\n    headers,\n    body: JSON.stringify(body),\n  });\n\n  const rawText = await response.text();\n  const payload = parseMcpHttpPayload(rawText, response.status);\n\n  if (!response.ok) {\n    throw new Error(`MCP HTTP ${response.status}: ${rawText.slice(0, 500)}`);\n  }\n\n  if (payload?.error) {\n    throw new Error(`MCP JSON-RPC error: ${JSON.stringify(payload.error)}`);\n  }\n\n  return { payload, headers: response.headers };\n}\n\nfunction parseToolResult(payload, toolName) {\n  const textPart = payload?.result?.content?.find((part) => part.type === 'text');\n  const text = textPart?.text;\n  if (!text) return payload?.result ?? payload;\n\n  let parsed = text;\n  try {\n    parsed = JSON.parse(text);\n  } catch {\n    return { text };\n  }\n\n  if (parsed?.success === false) {\n    throw new Error(`${toolName} failed: ${parsed.error || JSON.stringify(parsed)}`);\n  }\n\n  return parsed?.data ?? parsed;\n}\n\nlet mcpSessionId;\nlet sourceResult = null;\nlet askResult = null;\nconst validationPrompt = buildValidationPrompt();\n\ntry {\n  const initialized = await rpc({\n    jsonrpc: '2.0',\n    id: 1,\n    method: 'initialize',\n    params: {\n      protocolVersion: '2025-03-26',\n      capabilities: {},\n      clientInfo: { name: 'n8n-notebooklm-master-prompt-validation', version: '1.0.0' },\n    },\n  });\n\n  mcpSessionId = initialized.headers.get('mcp-session-id');\n  if (!mcpSessionId) {\n    throw new Error('MCP initialize did not return Mcp-Session-Id header');\n  }\n\n  let rpcId = 2;\n  async function callTool(name, args = {}) {\n    const { payload } = await rpc({\n      jsonrpc: '2.0',\n      id: rpcId++,\n      method: 'tools/call',\n      params: { name, arguments: args },\n    }, mcpSessionId);\n\n    return parseToolResult(payload, name);\n  }\n\n  if (shouldAddSource) {\n    const requestedType = String(input.source_type || '').toLowerCase();\n    const type = requestedType === 'url' || (!sourceText && sourceUrl) ? 'url' : 'text';\n    const content = type === 'url' ? sourceUrl : sourceText;\n\n    if (!content) {\n      throw new Error('No source content found. Provide master_prompt/source_bundle or source_url.');\n    }\n\n    sourceResult = await callTool('add_source', notebookTarget({\n      type,\n      content,\n      title: input.title || input.source_title || (type === 'url' ? sourceUrl : `K07 master prompt validation ${new Date().toISOString()}`),\n    }));\n\n    if (waitAfterUploadMs > 0) {\n      await new Promise((resolve) => setTimeout(resolve, waitAfterUploadMs));\n    }\n  }\n\n  askResult = await callTool('ask_question', notebookTarget({\n    question: validationPrompt,\n    source_format: sourceFormat,\n  }));\n\n  return [{\n    json: {\n      ok: true,\n      workflow: '18. Phan tich master prompt va validate do chinh xac bang NotebookLM',\n      answer: askResult.answer,\n      citations: askResult.sources || [],\n      validation_prompt: validationPrompt,\n      source_format: askResult.source_format || sourceFormat,\n      notebook_url: askResult.notebook_url,\n      notebooklm_session_id: askResult.session_id,\n      source_added: sourceResult,\n      questions_used: questions,\n      provenance: askResult._provenance,\n      raw: {\n        ask: askResult,\n      },\n    },\n  }];\n} finally {\n  if (mcpSessionId && input.keep_mcp_session !== true && input.keep_mcp_session !== 'true') {\n    try {\n      await fetch(mcpBaseUrl, { method: 'DELETE', headers: { 'Mcp-Session-Id': mcpSessionId } });\n    } catch (error) {\n      // Best-effort cleanup only.\n    }\n  }\n}"
+      },
+      "id": "684ac6e2-1f76-4a8b-bb3f-e469a5a0b7d6",
+      "name": "Validate Master Prompt with NotebookLM MCP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        80
+      ]
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "master_prompt": "Dat master prompt can validate vao day.",
+        "research_pack": "Dat research pack / source of truth vao day.",
+        "content_skeleton": "Dat content skeleton vao day.",
+        "competitor_analysis": "Dat competitor analysis vao day neu co.",
+        "title": "K07 Master Prompt validation sample",
+        "validation_goal": "Validate do chinh xac, bang chung, rui ro va muc do san sang san xuat.",
+        "notebook_url": "",
+        "mcp_base_url": "http://127.0.0.1:3000/mcp",
+        "source_format": "json"
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Validate Master Prompt with NotebookLM MCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d0b7bda9-649f-4336-a1a0-6b077558f257",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
