@@ -1,0 +1,19 @@
+{
+  "title": "Deep dive 9: Prompt video phải là thiết kế chuyển động",
+  "question": [
+    "Prompt video đã mô tả starting frame rõ ràng chưa?",
+    "Camera sẽ pan, dolly, push-in, handheld, aerial hay giữ tĩnh có chủ đích?",
+    "Chủ thể làm hành động cụ thể gì trong cảnh?",
+    "Môi trường có chuyển động nào hỗ trợ cảnh: gió, lá, bụi, mưa, khói, ánh sáng hay crowd?",
+    "Cảm xúc hoặc mood của chuyển động là gì?",
+    "Ánh sáng có thay đổi theo thời gian không?",
+    "End state của clip là gì để dựng có điểm kết rõ?",
+    "Prompt có constraint để tránh lỗi anatomy, chữ, vật thể hoặc chuyển động lạ không?",
+    "Chuyển động này có tạo thêm giá trị hay chỉ làm cảnh động cho có?",
+    "Cảnh bắt đầu và cảnh kết thúc có nối được với timeline trước/sau không?",
+    "Prompt có đủ thông tin thời gian, camera, hành động và kết quả không?",
+    "Có đang dùng kiểu prompt yếu như chỉ mô tả ảnh đẹp không?",
+    "Cần render lại, crop, che lỗi hay bỏ clip nếu motion sai không?",
+    "Công thức Starting frame - Camera - Subject action - Environment motion - Emotion - Lighting - End state - Constraints đã đủ chưa?"
+  ]
+}

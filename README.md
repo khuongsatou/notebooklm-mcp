@@ -105,6 +105,105 @@ For a local build, replace `command`/`args` with `"command": "node"`, `"args": [
 codex mcp add notebooklm npx notebooklm-mcp@latest
 ```
 
+### Codex app + active Chrome profile (no new profile)
+
+Use this workflow when you want Codex to work with the Google account that is
+already signed in on the active Chrome profile through the Codex Chrome
+extension. This keeps the current Chrome profile intact and does not create or
+switch to another Chrome profile.
+
+Fast local setup from this repository:
+
+```bash
+./scripts/connect-notebooklm-codex.sh
+```
+
+The helper script builds `dist/index.js`, verifies or registers the local
+`notebooklm` MCP entry in Codex, and opens NotebookLM in the active Chrome
+profile. If your logged-in Chrome profile is not the current default profile,
+pin it explicitly:
+
+```bash
+CHROME_PROFILE_DIRECTORY="Profile 3" ./scripts/connect-notebooklm-codex.sh
+```
+
+After the script finishes, restart or refresh Codex so the MCP tool list is
+reloaded for the current session.
+
+Manual equivalent:
+
+1. Build the local server from this repository:
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+2. Register the local MCP server in Codex:
+
+   ```bash
+   codex mcp add notebooklm node /Users/apple/Desktop/ex_project_8/mtips5s_mcp_ml/dist/index.js
+   codex mcp get notebooklm
+   ```
+
+   Expected result:
+
+   ```text
+   notebooklm
+     enabled: true
+     transport: stdio
+     command: node
+     args: /Users/apple/Desktop/ex_project_8/mtips5s_mcp_ml/dist/index.js
+   ```
+
+3. In Codex, use the Chrome extension/browser surface and open:
+
+   ```text
+   https://notebooklm.google.com/
+   ```
+
+4. Verify the visible NotebookLM page shows the intended Google account in the
+   active Chrome profile. For example, the account button should show the same
+   email that is already signed in to Gmail/Google in that Chrome window.
+
+5. Smoke test the connection with the Chrome extension surface:
+
+   - Open or claim `https://notebooklm.google.com/` in the active Chrome
+     profile.
+   - Create a new notebook.
+   - Add a public YouTube URL or webpage as a source.
+   - Ask a short grounded question, such as:
+
+     ```text
+     Analyze this source. Summarize the topic, structure, hook, key points,
+     retention drivers, and any transcript limitations. Separate direct
+     evidence from inference.
+     ```
+
+   A successful smoke test should show the new source in the NotebookLM source
+   list and produce an answer with source citations. If the YouTube transcript
+   is noisy or misdetected, keep using the notebook but ask NotebookLM to label
+   which claims are directly supported and which are inferred.
+
+Important: do not run `setup_auth`, `re_auth`, or `cleanup_data` if the goal is
+to avoid a separate NotebookLM MCP browser profile. Those tools belong to the
+package's Patchright flow and use the profile under:
+
+```text
+~/Library/Application Support/notebooklm-mcp/chrome_profile/
+```
+
+That is separate from the active system Chrome profile controlled by the Codex
+Chrome extension. In this mode, use Codex's Chrome extension for live
+NotebookLM browser actions, and use the MCP registration only after deciding
+whether you want the package's separate persistent profile flow.
+
+Note: `notebooklm.get_health` can still report `authenticated=false` in this
+workflow because that tool checks the package's separate Patchright browser
+profile. For the active-Chrome-profile workflow, the practical verification is
+that Codex can control the signed-in Chrome tab and NotebookLM shows the
+expected Google account.
+
 ### Generic MCP client (stdio)
 
 Any client that can spawn an MCP server over stdio can use the same `npx notebooklm-mcp@latest` invocation. The server speaks MCP 2025 + the SDK's `Server` capability set (`tools`, `resources`, `prompts`, `completions`, `logging`).

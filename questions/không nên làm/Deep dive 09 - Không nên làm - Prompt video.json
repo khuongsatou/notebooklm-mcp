@@ -1,0 +1,15 @@
+{
+  "title": "Deep dive 9: Không nên làm - Prompt video",
+  "question": [
+    "Prompt video có đang chỉ mô tả ảnh đẹp mà không thiết kế chuyển động theo thời gian không?",
+    "Có thiếu starting frame rõ ràng không?",
+    "Có thiếu camera motion cụ thể không?",
+    "Có thiếu subject action khiến chủ thể chỉ đứng đó cho có chuyển động không?",
+    "Có thiếu environment motion khiến không gian bị phẳng không?",
+    "Có thiếu emotion hoặc mood của cảnh không?",
+    "Có thiếu lighting change hoặc logic ánh sáng không?",
+    "Có thiếu end state khiến clip khó dựng không?",
+    "Có thiếu constraint để tránh lỗi AI lộ không?",
+    "Có chuyển động nào vô nghĩa, rung lắc hoặc không tăng giá trị cho cảnh không?"
+  ]
+}

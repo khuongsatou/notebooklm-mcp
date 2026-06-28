@@ -1,0 +1,135 @@
+{
+  "name": "17. Phan tich transcript va dan chung thong qua NotebookLM",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "transcript"
+            },
+            {
+              "name": "document_text"
+            },
+            {
+              "name": "text"
+            },
+            {
+              "name": "source_url"
+            },
+            {
+              "name": "source_type"
+            },
+            {
+              "name": "title"
+            },
+            {
+              "name": "question"
+            },
+            {
+              "name": "goal"
+            },
+            {
+              "name": "notebook_id"
+            },
+            {
+              "name": "notebook_url"
+            },
+            {
+              "name": "notebooklm_session_id"
+            },
+            {
+              "name": "mcp_base_url"
+            },
+            {
+              "name": "source_format"
+            },
+            {
+              "name": "add_source"
+            },
+            {
+              "name": "wait_after_upload_ms"
+            },
+            {
+              "name": "show_browser"
+            },
+            {
+              "name": "keep_mcp_session"
+            }
+          ]
+        }
+      },
+      "id": "87ac5464-d0e9-4f6e-9b0f-51f4e9c0d701",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -540,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Workflow con: NotebookLM transcript analysis\n\nChay MCP server truoc:\n`cd /Users/apple/Desktop/ex_project_8/mtips5s_mcp_ml && npm run build && node dist/index.js --transport http --port 3000 --host 127.0.0.1`\n\nInput quan trong:\n- `transcript` hoac `document_text`/`text`: noi dung can them vao NotebookLM\n- `source_url`: URL de NotebookLM crawl neu khong co text\n- `notebook_id` hoac `notebook_url`: notebook dich, bo trong de dung active notebook\n- `question`: cau hoi tuy bien, bo trong de dung prompt phan tich mac dinh\n- `source_format`: `footnotes` mac dinh, co the dung `json` de lay citations dang mang",
+        "height": 340,
+        "width": 520,
+        "color": 4
+      },
+      "id": "869f0aa9-36e4-4780-a59f-c90d886ac75f",
+      "name": "Usage Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nlet mcpBaseUrl = String(input.mcp_base_url || input.mcpUrl || 'http://127.0.0.1:3000/mcp').replace(/\\/$/, '');\nif (mcpBaseUrl.startsWith('http') && !mcpBaseUrl.endsWith('/mcp')) mcpBaseUrl = `${mcpBaseUrl}/mcp`;\nconst sourceText = String(input.transcript || input.document_text || input.text || input.content || '').trim();\nconst sourceUrl = String(input.source_url || input.url || '').trim();\nconst sourceFormat = String(input.source_format || 'footnotes');\nconst waitAfterUploadMs = Number(input.wait_after_upload_ms ?? 15000);\nconst shouldAddSource = input.add_source !== false && input.add_source !== 'false' && Boolean(sourceText || sourceUrl);\nconst showBrowser = input.show_browser === true || input.show_browser === 'true';\n\nif (!mcpBaseUrl.startsWith('http')) {\n  throw new Error('mcp_base_url must be an HTTP URL, for example http://127.0.0.1:3000/mcp');\n}\n\nfunction notebookTarget(extra = {}) {\n  const target = { ...extra };\n  if (input.notebook_id) target.notebook_id = input.notebook_id;\n  if (input.notebook_url) target.notebook_url = input.notebook_url;\n  if (input.notebooklm_session_id) target.session_id = input.notebooklm_session_id;\n  if (showBrowser) target.show_browser = true;\n  return target;\n}\n\nfunction buildDefaultQuestion() {\n  const goal = input.goal ? `\\nMuc tieu cua nguoi dung: ${input.goal}` : '';\n  const title = input.title ? `\\nTieu de nguon: ${input.title}` : '';\n  return [\n    'Hay phan tich transcript/tai lieu/y tuong vua duoc cung cap bang NotebookLM.',\n    'Tra loi bang tieng Viet, ro rang, uu tien dan chung tu nguon. Neu ket luan nao khong duoc nguon ho tro, hay noi ro la suy luan.',\n    title + goal,\n    '',\n    'Can tra ve cac phan sau:',\n    '1. Tom tat 5-7 y cot loi.',\n    '2. Cac luan diem/chung cu quan trong, kem footnote hoac danh sach nguon.',\n    '3. Nhung y tuong co the phat trien thanh noi dung, san pham, bai viet hoac kich ban.',\n    '4. Khoang trong, mau thuan, rui ro, diem can xac minh them.',\n    '5. De xuat hanh dong tiep theo theo thu tu uu tien.',\n    '6. Trich xuat cac quote/chi tiet dang dung lai, neu co.'\n  ].join('\\n');\n}\n\nfunction parseMcpHttpPayload(rawText, status) {\n  const trimmed = rawText.trim();\n  if (!trimmed) return null;\n\n  try {\n    return JSON.parse(trimmed);\n  } catch {\n    // Streamable HTTP may answer POST as server-sent events.\n  }\n\n  const dataLines = [];\n  for (const line of trimmed.split(/\\r?\\n/)) {\n    if (line.startsWith('data:')) dataLines.push(line.slice(5).trimStart());\n  }\n\n  if (dataLines.length > 0) {\n    const data = dataLines.join('\\n');\n    try {\n      return JSON.parse(data);\n    } catch {\n      throw new Error(`MCP returned invalid SSE JSON (${status}): ${data.slice(0, 500)}`);\n    }\n  }\n\n  throw new Error(`MCP returned non-JSON response (${status}): ${rawText.slice(0, 500)}`);\n}\n\nasync function rpc(body, mcpSessionId) {\n  const headers = {\n    accept: 'application/json, text/event-stream',\n    'content-type': 'application/json',\n  };\n  if (mcpSessionId) headers['Mcp-Session-Id'] = mcpSessionId;\n\n  const response = await fetch(mcpBaseUrl, {\n    method: 'POST',\n    headers,\n    body: JSON.stringify(body),\n  });\n\n  const rawText = await response.text();\n  const payload = parseMcpHttpPayload(rawText, response.status);\n\n  if (!response.ok) {\n    throw new Error(`MCP HTTP ${response.status}: ${rawText.slice(0, 500)}`);\n  }\n\n  if (payload?.error) {\n    throw new Error(`MCP JSON-RPC error: ${JSON.stringify(payload.error)}`);\n  }\n\n  return { payload, headers: response.headers };\n}\n\nfunction parseToolResult(payload, toolName) {\n  const textPart = payload?.result?.content?.find((part) => part.type === 'text');\n  const text = textPart?.text;\n  if (!text) return payload?.result ?? payload;\n\n  let parsed = text;\n  try {\n    parsed = JSON.parse(text);\n  } catch {\n    return { text };\n  }\n\n  if (parsed?.success === false) {\n    throw new Error(`${toolName} failed: ${parsed.error || JSON.stringify(parsed)}`);\n  }\n\n  return parsed?.data ?? parsed;\n}\n\nlet mcpSessionId;\nlet sourceResult = null;\nlet askResult = null;\n\ntry {\n  const initialized = await rpc({\n    jsonrpc: '2.0',\n    id: 1,\n    method: 'initialize',\n    params: {\n      protocolVersion: '2025-03-26',\n      capabilities: {},\n      clientInfo: { name: 'n8n-notebooklm-transcript-analysis', version: '1.0.0' },\n    },\n  });\n\n  mcpSessionId = initialized.headers.get('mcp-session-id');\n  if (!mcpSessionId) {\n    throw new Error('MCP initialize did not return Mcp-Session-Id header');\n  }\n\n  let rpcId = 2;\n  async function callTool(name, args = {}) {\n    const { payload } = await rpc({\n      jsonrpc: '2.0',\n      id: rpcId++,\n      method: 'tools/call',\n      params: { name, arguments: args },\n    }, mcpSessionId);\n\n    return parseToolResult(payload, name);\n  }\n\n  if (shouldAddSource) {\n    const requestedType = String(input.source_type || '').toLowerCase();\n    const type = requestedType === 'url' || (!sourceText && sourceUrl) ? 'url' : 'text';\n    const content = type === 'url' ? sourceUrl : sourceText;\n\n    if (!content) {\n      throw new Error('No source content found. Provide transcript/document_text/text or source_url.');\n    }\n\n    sourceResult = await callTool('add_source', notebookTarget({\n      type,\n      content,\n      title: input.title || input.source_title || (type === 'url' ? sourceUrl : `Transcript ${new Date().toISOString()}`),\n    }));\n\n    if (waitAfterUploadMs > 0) {\n      await new Promise((resolve) => setTimeout(resolve, waitAfterUploadMs));\n    }\n  }\n\n  askResult = await callTool('ask_question', notebookTarget({\n    question: input.question || input.prompt || buildDefaultQuestion(),\n    source_format: sourceFormat,\n  }));\n\n  return [{\n    json: {\n      ok: true,\n      workflow: '17. Phan tich transcript va dan chung thong qua NotebookLM',\n      answer: askResult.answer,\n      citations: askResult.sources || [],\n      question: askResult.question || input.question || input.prompt || buildDefaultQuestion(),\n      source_format: askResult.source_format || sourceFormat,\n      notebook_url: askResult.notebook_url,\n      notebooklm_session_id: askResult.session_id,\n      source_added: sourceResult,\n      provenance: askResult._provenance,\n      raw: {\n        ask: askResult,\n      },\n    },\n  }];\n} finally {\n  if (mcpSessionId && input.keep_mcp_session !== true && input.keep_mcp_session !== 'true') {\n    try {\n      await fetch(mcpBaseUrl, { method: 'DELETE', headers: { 'Mcp-Session-Id': mcpSessionId } });\n    } catch (error) {\n      // Best-effort cleanup only.\n    }\n  }\n}"
+      },
+      "id": "f4dcc2a2-6afe-4d9a-af44-a6b0c92d5724",
+      "name": "Analyze with NotebookLM MCP",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        40
+      ]
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "transcript": "Dat transcript hoac noi dung tai lieu vao day.",
+        "title": "Tai lieu mau",
+        "goal": "Tim y tuong, dan chung va cac diem co the phat trien thanh noi dung.",
+        "notebook_url": "",
+        "mcp_base_url": "http://127.0.0.1:3000/mcp",
+        "source_format": "footnotes"
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Analyze with NotebookLM MCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6db04449-c13e-45df-a0ad-8f5b7a7ea518",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

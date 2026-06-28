@@ -1,0 +1,15 @@
+{
+  "title": "Deep dive 10: Không nên làm - Animate vô nghĩa",
+  "question": [
+    "Có đang animate ảnh chỉ vì sợ cảnh tĩnh không?",
+    "Có cảnh tri thức cần nhìn kỹ nhưng lại dùng chuyển động quá nhiều không?",
+    "Có cảnh thiết lập bối cảnh mà ảnh + pan/zoom nhẹ đã đủ nhưng vẫn tốn AI video không?",
+    "Có cảnh cảm xúc nội tâm bị phá vì chuyển động quá đà không?",
+    "Có cảnh cần tính xác thực cao nhưng lại dùng AI video dễ sai chi tiết không?",
+    "Có chuyển động nào không tạo thêm thông tin, cảm xúc hoặc retention không?",
+    "Có đang lãng phí chi phí video vào cảnh không cần animate không?",
+    "Có clip lỗi AI được giữ lại chỉ vì đã tốn công render không?",
+    "Timeline có bị mệt vì cảnh nào cũng chuyển động không?",
+    "Có bỏ qua stock, tư liệu thật, diagram hoặc ảnh tĩnh dù chúng phù hợp hơn không?"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "manifest_version": 3,
+  "name": "MCP ML",
+  "version": "0.2.0",
+  "description": "Local agent bridge for the MCP ML project.",
+  "permissions": ["storage", "alarms", "tabs", "webRequest", "scripting", "declarativeNetRequest", "sidePanel", "cookies"],
+  "host_permissions": [
+    "https://notebooklm.google.com/*",
+    "https://labs.google/*",
+    "https://aisandbox-pa.googleapis.com/*",
+    "https://flow-content.google/*",
+    "https://storage.googleapis.com/*",
+    "http://127.0.0.1:8100/*",
+    "http://127.0.0.1:9222/*",
+    "http://127.0.0.1:20128/*",
+    "https://*.1nutrouter.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' http://127.0.0.1:8100 http://127.0.0.1:9222 http://127.0.0.1:20128 ws://127.0.0.1:9222 https://*.1nutrouter.com https://notebooklm.google.com https://labs.google https://aisandbox-pa.googleapis.com https://flow-content.google https://storage.googleapis.com;"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://labs.google/fx/tools/flow*",
+        "https://labs.google/fx/*/tools/flow*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": ["https://labs.google/*"]
+    }
+  ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "referer_rules",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "side_panel": {
+    "default_path": "side_panel.html"
+  },
+  "action": {
+    "default_title": "MCP ML",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  }
+}

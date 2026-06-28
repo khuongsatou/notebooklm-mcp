@@ -1,0 +1,19 @@
+{
+  "title": "Deep dive 6: Master Prompt không phải một câu lệnh dài",
+  "question": [
+    "Master Prompt đã có đủ bối cảnh dự án: kênh, thị trường, audience, ngôn ngữ và format chưa?",
+    "Dữ liệu nền nào cần đưa vào prompt: research, đối thủ, insight, visual direction hay nguồn tham khảo?",
+    "AI đang được giao vai trò nào: strategist, scriptwriter, visual director, SEO assistant hay QA reviewer?",
+    "Nhiệm vụ cụ thể của prompt là tạo topic, script, image prompt, video prompt, SEO hay checklist?",
+    "Prompt có ràng buộc rõ về không bịa, không claim quá đà, đúng style, đúng độ dài và đúng cấu trúc không?",
+    "Prompt có tiêu chí tự kiểm về uniqueness, retention, consistency, factual safety và production feasibility không?",
+    "Output format cần là bảng, JSON, section, prompt list, shot list hay checklist?",
+    "Những quyết định nào con người phải chốt trước khi viết Master Prompt?",
+    "AI đã đưa option chưa và con người đã chọn option nào để xây tiếp?",
+    "Prompt có đang mơ hồ vì chưa chốt micro-niche, vai trò kênh hoặc thị trường không?",
+    "Prompt có tạo output đẹp nhưng không phục vụ chiến lược nào không?",
+    "Phần nào của Master Prompt cần tách thành module để tái sử dụng?",
+    "Prompt có đủ dữ liệu thật để NotebookML phân tích sâu không?",
+    "Kết quả prompt có thể kiểm tra bằng QA cụ thể nào?"
+  ]
+}

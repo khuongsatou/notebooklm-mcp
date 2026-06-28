@@ -1,0 +1,15 @@
+Các prompt speaker dùng để chat với NotebookLM
+
+Trong buổi 2026-06-20 này không có prompt NotebookLM nguyên văn được speaker đọc hoặc demo trực tiếp. Speaker chỉ nói vai trò của NotebookLM và bảo buổi sau sẽ học chi tiết. Vì vậy nếu cần trích "prompt speaker đã sử dụng", kết luận an toàn là: chưa có prompt cụ thể trong transcript buổi này.
+
+Nếu tái dựng theo đúng ý speaker, bộ prompt NotebookLM nên xoay quanh các câu như:
+
+1. Phân tích các nguồn/video đối thủ trong notebook này. Cho tôi biết mỗi video đang nói về chủ đề gì, cấu trúc nội dung ra sao, hook mở đầu là gì, các luận điểm chính là gì, và điểm nào khiến người xem giữ lại.
+
+2. Từ các video đối thủ, hãy tổng hợp các pattern nội dung lặp lại: chủ đề phổ biến, angle triển khai, cách đặt vấn đề, ví dụ/case được dùng, nhịp kể chuyện, điểm mạnh và điểm yếu.
+
+3. Tìm khoảng trống nội dung mà các đối thủ chưa khai thác tốt. Đề xuất các góc làm video khác biệt hơn nhưng vẫn bám nhu cầu người xem.
+
+4. Biến phần phân tích đối thủ thành outline video mới cho kênh của tôi: không copy, chỉ tổng hợp insight, cấu trúc lại thành ý tưởng riêng, có hook, các section chính và hướng visual.
+
+Nhưng 4 prompt trên là prompt tái dựng từ workflow speaker mô tả, không phải prompt nguyên văn trong buổi 20/06.

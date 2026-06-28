@@ -1,0 +1,19 @@
+{
+  "title": "Deep dive 8: Storyboard ảnh là điểm khóa chất lượng",
+  "question": [
+    "Storyboard ảnh đã khóa được nhân vật, bối cảnh, chất liệu, ánh sáng, palette, góc máy và mood chưa?",
+    "Nhìn 5-10 ảnh liên tiếp có thấy cùng một thế giới hình ảnh không?",
+    "Nhân vật, loài, vật thể hoặc đạo cụ chính có bị đổi vô lý giữa các ảnh không?",
+    "Màu và ánh sáng có chủ đích hay đang random theo từng prompt?",
+    "Mỗi ảnh đang phục vụ section, cảm xúc hoặc ý nghĩa cụ thể nào?",
+    "Storyboard có đủ ảnh thiết lập, ảnh hành động, ảnh chi tiết và ảnh kết không?",
+    "Ảnh nào có bố cục sạch để animate, ảnh nào chỉ nên dùng tĩnh?",
+    "Có ảnh nào đẹp nhưng sai thời đại, sai văn hóa hoặc sai dữ kiện không?",
+    "Có ảnh nào phá consistency của kênh không?",
+    "Ảnh có đủ visual anchor để nối với script và voice không?",
+    "Storyboard có đang bỏ qua cảnh chuyển nhịp hoặc cảnh thở không?",
+    "Nếu storyboard ảnh đã sai, video prompt sẽ khuếch đại lỗi nào?",
+    "Cần sửa prompt ảnh, reference hay visual bible để khóa chất lượng tốt hơn?",
+    "Bộ storyboard này có thể làm mẫu cho các video sau không?"
+  ]
+}

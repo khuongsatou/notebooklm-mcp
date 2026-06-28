@@ -1,0 +1,15 @@
+{
+  "title": "Deep dive 13: Không nên làm - Đoán analytics",
+  "question": [
+    "Có đang đổi thumbnail ngay hoặc đổi ngách ngay khi video không lên mà chưa đọc dữ liệu không?",
+    "Có đang nhầm impressions thấp với lỗi thumbnail không?",
+    "Có đang nhầm CTR thấp với lỗi nội dung không?",
+    "Có CTR tốt nhưng retention thấp mà vẫn chỉ sửa title/thumbnail không?",
+    "Có retention tốt nhưng subscriber thấp mà chưa xem lại channel promise, CTA, series hoặc playlist không?",
+    "Có view tăng bất thường nhưng tương tác rỗng mà chưa kiểm tra traffic source, geography và comment quality không?",
+    "Có đang sửa mọi thứ cùng lúc làm mất khả năng học không?",
+    "Có thiếu một giả thuyết chính cho mỗi lần test không?",
+    "Có kết luận dựa trên cảm giác thay vì impressions, CTR, retention, traffic source và audience fit không?",
+    "Có bỏ ngách quá sớm khi chưa đủ dữ liệu để kết luận không?"
+  ]
+}

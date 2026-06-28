@@ -1,0 +1,19 @@
+{
+  "title": "Deep dive 10: Không animate vô nghĩa",
+  "question": [
+    "Cảnh này có thật sự cần chuyển động để tăng giá trị không?",
+    "Cảnh thuộc loại hành động, biến đổi, reveal, thiết lập bối cảnh, tri thức cần nhìn kỹ, cảm xúc nội tâm hay xác thực cao?",
+    "Nếu là cảnh hành động hoặc reveal, chuyển động cụ thể làm tăng retention ở đâu?",
+    "Nếu là cảnh thiết lập bối cảnh, ảnh tĩnh kèm pan/zoom nhẹ đã đủ chưa?",
+    "Nếu là cảnh tri thức cần nhìn kỹ, chuyển động có làm mất tập trung không?",
+    "Nếu là cảnh cảm xúc nội tâm, ảnh tĩnh hoặc slow push-in có giữ cảm xúc tốt hơn không?",
+    "Nếu là cảnh cần tính xác thực cao, có nên dùng stock hoặc tư liệu thật hợp lệ không?",
+    "Chi phí animate cảnh này có xứng với giá trị retention hoặc cảm xúc tạo ra không?",
+    "Có bao nhiêu cảnh trong video chỉ đang động vì sợ tĩnh?",
+    "Timeline có đủ nhịp nghỉ thị giác không?",
+    "Có cảnh tĩnh nào nên được giữ để người xem nhìn kỹ hơn không?",
+    "Cảnh animate có làm lộ lỗi AI nhiều hơn ảnh tĩnh không?",
+    "Quyết định cuối cùng cho cảnh này là AI video, ảnh + pan/zoom, diagram, stock hay bỏ?",
+    "Cắt giảm animate ở đâu giúp video gọn, rẻ và chắc hơn?"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Deep dive 6: Không nên làm - Master Prompt",
+  "question": [
+    "Có đang xem Master Prompt chỉ là một câu lệnh dài kiểu 'viết thật hay, cinematic, viral' không?",
+    "Có thiếu bối cảnh dự án: kênh, thị trường, audience, ngôn ngữ hoặc format không?",
+    "Có thiếu dữ liệu nền từ research, đối thủ, insight, visual direction hoặc nguồn tham khảo không?",
+    "Có giao vai trò AI mơ hồ khiến output không biết phục vụ ai không?",
+    "Có thiếu nhiệm vụ cụ thể cho topic, script, image prompt, video prompt hoặc SEO không?",
+    "Có thiếu ràng buộc về không bịa, không claim quá đà, đúng style, đúng độ dài và đúng cấu trúc không?",
+    "Có thiếu tiêu chí tự kiểm về uniqueness, retention, consistency, factual safety và production feasibility không?",
+    "Có thiếu output format rõ ràng như bảng, JSON, section, shot list hoặc checklist không?",
+    "Có đang yêu cầu AI xây tiếp trước khi con người chọn micro-niche, vai trò kênh và thị trường không?",
+    "Có output đẹp nhưng không biết phục vụ chiến lược nào không?"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "title": "Deep dive 13: Đọc analytics thay vì đoán",
+  "question": [
+    "Vấn đề chính của video là impressions thấp, CTR thấp, retention thấp, subscriber thấp hay tương tác rỗng?",
+    "Nếu impressions thấp, YouTube chưa hiểu kênh/video hay topic thiếu fit?",
+    "Nếu CTR thấp, title, thumbnail, promise hay benchmark đối thủ đang yếu?",
+    "Nếu CTR tốt nhưng retention thấp, hook, nhịp mở bài, script, voice hay visual mismatch có vấn đề?",
+    "Nếu retention tốt nhưng subscriber thấp, kênh promise, CTA mềm, series hoặc playlist có yếu không?",
+    "Nếu view tăng bất thường nhưng tương tác rỗng, traffic source, geography và comment quality nói gì?",
+    "Dữ liệu nào đang ủng hộ giả thuyết chính?",
+    "Dữ liệu nào đang phản bác giả thuyết chính?",
+    "Có đang sửa mọi thứ cùng lúc làm mất khả năng học không?",
+    "Một giả thuyết chính cần test ở lần sửa tiếp theo là gì?",
+    "Cần giữ nguyên biến nào để biết thay đổi có tác dụng?",
+    "Video này yếu do packaging, nội dung, audience fit, SEO hay consistency chủ đề?",
+    "Sau analytics, hành động tiếp theo là đổi title, đổi thumbnail, sửa hook, đổi format, làm tiếp series hay dừng angle?",
+    "Bài học nào từ video này cần đưa vào SOP cho video sau?"
+  ]
+}

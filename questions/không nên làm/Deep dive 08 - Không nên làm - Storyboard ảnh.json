@@ -1,0 +1,15 @@
+{
+  "title": "Deep dive 8: Không nên làm - Storyboard ảnh",
+  "question": [
+    "Có đang bỏ qua storyboard ảnh tĩnh vì muốn tạo video ngay không?",
+    "Ảnh tĩnh có sai nhân vật, bối cảnh, chất liệu, ánh sáng, palette, góc máy hoặc mood không?",
+    "Nhìn 5-10 ảnh liên tiếp có thấy như nhiều thế giới khác nhau không?",
+    "Nhân vật, loài hoặc vật thể có đổi vô lý giữa các ảnh không?",
+    "Màu và ánh sáng có random, không có chủ đích không?",
+    "Có ảnh nào không phục vụ section hoặc cảm xúc cụ thể không?",
+    "Có thiếu ảnh thiết lập, ảnh hành động, ảnh chi tiết hoặc ảnh kết không?",
+    "Có ảnh nào sai thời đại, sai văn hóa hoặc sai dữ kiện không?",
+    "Có đang để video prompt phía sau khuếch đại lỗi của storyboard ảnh không?",
+    "Có ảnh đẹp nhưng không dùng được để animate vì bố cục rối hoặc chủ thể không rõ không?"
+  ]
+}
