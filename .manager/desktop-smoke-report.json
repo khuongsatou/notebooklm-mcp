@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T16:36:22.866Z",
+  "generatedAt": "2026-06-29T04:57:00.388Z",
   "counts": {
     "PASS": 17,
     "SKIP": 6
@@ -8,15 +8,15 @@
     {
       "name": "bridge.start",
       "status": "PASS",
-      "ms": 3,
+      "ms": 2,
       "details": {
-        "url": "http://127.0.0.1:52090"
+        "url": "http://127.0.0.1:50543"
       }
     },
     {
       "name": "api.info",
       "status": "PASS",
-      "ms": 6,
+      "ms": 18,
       "details": {
         "version": "2.0.0"
       }
@@ -24,7 +24,7 @@
     {
       "name": "settings.get",
       "status": "PASS",
-      "ms": 2,
+      "ms": 4,
       "details": {
         "hasProviderApiKey": false
       }
@@ -41,7 +41,7 @@
     {
       "name": "logs.write/list/clear",
       "status": "PASS",
-      "ms": 3,
+      "ms": 4,
       "details": {
         "cleared": true
       }
@@ -57,7 +57,7 @@
     {
       "name": "mcp.health",
       "status": "PASS",
-      "ms": 728,
+      "ms": 371,
       "details": {
         "authenticated": false,
         "sessions": 0
@@ -66,7 +66,7 @@
     {
       "name": "mcp.tools",
       "status": "PASS",
-      "ms": 3,
+      "ms": 4,
       "details": {
         "count": 20
       }
@@ -74,7 +74,7 @@
     {
       "name": "notebooks.list",
       "status": "PASS",
-      "ms": 5,
+      "ms": 3,
       "details": {
         "count": 0
       }
@@ -82,7 +82,7 @@
     {
       "name": "sessions.list",
       "status": "PASS",
-      "ms": 3,
+      "ms": 2,
       "details": {
         "count": 0
       }
@@ -105,7 +105,7 @@
     {
       "name": "content.questions.list_read",
       "status": "PASS",
-      "ms": 13,
+      "ms": 12,
       "details": {
         "count": 33,
         "sample": "không nên làm/Deep dive 01 - Không nên làm - Tư duy đạo diễn AI.json",
@@ -115,9 +115,9 @@
     {
       "name": "content.workspace.list_read",
       "status": "PASS",
-      "ms": 1,
+      "ms": 3,
       "details": {
-        "count": 4,
+        "count": 50,
         "sample": "chapter/1.txt",
         "bytes": 0
       }
@@ -133,7 +133,7 @@
     {
       "name": "agent.config",
       "status": "PASS",
-      "ms": 1,
+      "ms": 0,
       "details": {
         "toolCount": 11
       }
@@ -141,7 +141,7 @@
     {
       "name": "agent.provider_test_expected_fail",
       "status": "PASS",
-      "ms": 15,
+      "ms": 13,
       "details": {
         "handledError": "fetch failed"
       }

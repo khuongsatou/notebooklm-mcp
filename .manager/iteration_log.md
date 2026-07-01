@@ -15,3 +15,9 @@
 | 2026-06-28 | QA | Re-ran desktop content smoke test | Pass with manual skips | 16 pass, 6 skipped/manual; report `.manager/desktop-smoke-report.json` |
 | 2026-06-28 | Developer | Changed Connect to System Chrome profile flow | Done | Added settings for connect mode/profile and bridge endpoint to open/focus NotebookLM in existing Chrome profile |
 | 2026-06-28 | QA | Re-ran desktop smoke test | Pass with manual skips | 17 pass, 6 skipped/manual; report `.manager/desktop-smoke-report.json` |
+| 2026-06-29 | Project Manager | Kết nối NotebookLM qua System Chrome Profile 185 (vankhuong240499@gmail.com) | Done | Bridge API `/api/auth/open-system-profile` thành công |
+| 2026-06-29 | Project Manager | MCP authenticate qua patchright browser (show_browser=true) | Done | `authenticated: true` xác nhận |
+| 2026-06-29 | Developer | Tạo notebook phân tích YouTube: "Vì sao lại chơi GAME LẬU?" | Done | Notebook đăng ký MCP ID `ph-n-t-ch-v-sao-l-i-ch-i-game-` |
+| 2026-06-29 | Developer | Lấy transcript YouTube bằng yt-dlp (VTT format) | Done | 15,356 chars, tiếng Việt auto-generated |
+| 2026-06-29 | QA | Validate 20 yếu tố nội dung transcript | Pass 20/20 (100%) | Tất cả nghiên cứu, case study, luận điểm đều xác nhận |
+| 2026-06-29 | Developer | Add source YouTube URL + transcript text vào notebook MCP | In Progress | 2 browser sessions đang xử lý |

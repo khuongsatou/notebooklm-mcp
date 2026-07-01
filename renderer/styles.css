@@ -202,8 +202,18 @@ p { margin: 0; }
   overflow-x: auto;
 }
 .tab {
-  flex: 0 0 42px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 42px;
   height: 38px;
+  padding: 0 12px;
+  font-weight: 800;
+}
+.tab-label {
+  font-size: 12px;
   font-weight: 800;
 }
 .tab.active {
@@ -622,7 +632,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--brand); }
   .chat-input-row, .log-toolbar {
     grid-template-columns: 1fr;
   }
-  .agent-panel { min-height: 520px; }
+  .agent-panel { min-height: 460px; }
 }
 
 @media (max-width: 520px) {
@@ -637,6 +647,30 @@ input:focus, textarea:focus, select:focus { border-color: var(--brand); }
   .brand p { font-size: 12px; }
   .top-actions {
     gap: 7px;
+  }
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .metric {
+    min-height: 70px;
+    padding: 10px;
+    gap: 2px 8px;
+  }
+  .metric span { font-size: 18px; }
+  .metric b { font-size: 16px; }
+  .metric small {
+    font-size: 10px;
+    letter-spacing: .06em;
+  }
+  .tab {
+    padding: 0 10px;
+  }
+  .tab:not(.active) .tab-label {
+    display: none;
+  }
+  .tab.active {
+    min-width: 86px;
   }
   .status-pill, .version-pill, .connection-status {
     min-height: 34px;
@@ -660,9 +694,17 @@ input:focus, textarea:focus, select:focus { border-color: var(--brand); }
     justify-content: flex-start;
   }
   .log-entry {
-    grid-template-columns: 72px 56px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    gap: 3px;
   }
   .modal {
     width: calc(100vw - 24px);
+  }
+  .agent-panel { min-height: 420px; }
+  .agent-msg { max-width: 100%; }
+  .chip-row { padding: 9px 12px; }
+  .chat-input-row {
+    gap: 8px;
+    padding: 10px 12px;
   }
 }

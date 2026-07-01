@@ -27,6 +27,10 @@ let update;
 let agent;
 let bridge;
 
+function getUserDataDir() {
+  return process.env.NOTEBOOK_DESKTOP_USER_DATA_DIR || app.getPath('userData');
+}
+
 function focusMainWindow() {
   if (!mainWindow) return;
   if (mainWindow.isMinimized()) mainWindow.restore();
@@ -35,9 +39,10 @@ function focusMainWindow() {
 }
 
 function createServices() {
-  settings = new DesktopSettings({ userDataDir: app.getPath('userData') });
-  credentials = new CredentialStore({ userDataDir: app.getPath('userData'), safeStorage });
-  log = new NotebookLogManager({ userDataDir: app.getPath('userData'), retention: settings.read().logRetention });
+  const userDataDir = getUserDataDir();
+  settings = new DesktopSettings({ userDataDir });
+  credentials = new CredentialStore({ userDataDir, safeStorage });
+  log = new NotebookLogManager({ userDataDir, retention: settings.read().logRetention });
   hub = new NotebookSocketHub();
   mcp = new NotebookMcpAdapter({ rootDir: ROOT_DIR, settings, log, hub });
   update = new NotebookUpdateClient({ appInfo: APP_INFO, settings, log });

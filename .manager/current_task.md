@@ -2,24 +2,28 @@
 
 ## Status
 
-- State: Implemented / Needs UX Review
+- State: In Progress — Adding YouTube sources to NotebookLM
 - Owner: Project Manager
 - Priority: High
-- Started At: 2026-06-28
+- Started At: 2026-06-29
 
 ## Task
 
-Triển khai desktop app Electron cho NotebookLM MCP dựa trên reference `mtips5s_profile_pro`, gồm UI/UX, backend bridge, API/SSE, version update modal, NotebookLM connect flow, Agent Chat và settings.
+Tạo notebook NotebookLM phân tích video YouTube "Vì sao lại chơi GAME LẬU? | Giải Mã Bí Ẩn" (Game Cực Hay), lấy transcript, validate nội dung, và add source vào notebook qua MCP.
 
-Update mới:
-- Thêm tab `Questions` và `Workspace` để duyệt/xem/copy nội dung từ thư mục `questions/` và `workspace/`.
-- Nút `Connect` ưu tiên focus/mở NotebookLM trong Chrome profile hệ thống đã login/nhúng extension, tránh tự mở profile auth riêng của MCP.
+**Notebook:** https://notebooklm.google.com/notebook/1b5ce23a-319e-4aaf-94bf-6c31e7623962
 
 ## Scope
 
-- In scope: Electron shell, preload IPC, renderer dashboard/views, bridge server, MCP HTTP adapter, SSE events, NotebookLM workflows, System Chrome connect flow, Agent Chat, Questions/Workspace content viewer, update modal, settings/secret storage, scripts.
-- Out of scope: Signed/notarized production installer; current packaging creates a local runnable app bundle.
+- [x] Kết nối NotebookLM qua System Chrome Profile 185
+- [x] MCP authenticate (patchright browser)
+- [x] Đăng ký notebook vào MCP library
+- [x] Lấy transcript YouTube bằng yt-dlp
+- [x] Validate 20/20 yếu tố nội dung (100%)
+- [ ] Add source YouTube URL vào notebook (MCP browser đang xử lý)
+- [ ] Add source transcript text vào notebook (MCP browser đang xử lý)
 
 ## Next Action
 
-Customer/UX Reviewer mở `npm run desktop` hoặc app bundle trong `release/` để kiểm tra trực quan app Electron và flow đăng nhập NotebookLM thật.
+Chờ 2 MCP browser sessions hoàn tất add_source. Sau đó dùng `ask_question` để query notebook và validate qua NotebookLM Gemini.
+

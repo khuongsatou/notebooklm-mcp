@@ -17,6 +17,8 @@ const state = {
   selectedWorkspace: null,
 };
 
+window.__notebookDesktopSmoke = state;
+
 const $ = (id) => document.getElementById(id);
 
 function esc(value) {
