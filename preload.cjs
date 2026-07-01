@@ -29,6 +29,8 @@ contextBridge.exposeInMainWorld('notebookDesktop', {
     reauth: (payload) => ipcRenderer.invoke('notebook:reauth', payload),
     openSystemProfile: (payload) => ipcRenderer.invoke('notebook:open-system-profile', payload),
     ask: (payload) => ipcRenderer.invoke('notebook:ask', payload),
+    askSafe: (payload) => ipcRenderer.invoke('notebook:ask-safe', payload),
+    doctor: (payload) => ipcRenderer.invoke('notebook:doctor', payload),
     addSource: (payload) => ipcRenderer.invoke('notebook:add-source', payload),
     audioGenerate: (payload) => ipcRenderer.invoke('notebook:audio-generate', payload),
     audioStatus: (payload) => ipcRenderer.invoke('notebook:audio-status', payload),

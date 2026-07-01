@@ -21,3 +21,5 @@
 | 2026-06-29 | Developer | Lấy transcript YouTube bằng yt-dlp (VTT format) | Done | 15,356 chars, tiếng Việt auto-generated |
 | 2026-06-29 | QA | Validate 20 yếu tố nội dung transcript | Pass 20/20 (100%) | Tất cả nghiên cứu, case study, luận điểm đều xác nhận |
 | 2026-06-29 | Developer | Add source YouTube URL + transcript text vào notebook MCP | In Progress | 2 browser sessions đang xử lý |
+| 2026-07-01 | Project Manager | Báo cáo tiến độ dự án | In Progress | Build/check desktop pass; safe ask/doctor delta detected; source ingestion validation and secret hygiene remain open |
+| 2026-07-01 | Developer | Triển khai kết nối NotebookLM ổn định qua extension | Done | Added NotebookLM bridge settings, Test NotebookLM, fk_notebook tools, `/fk-notebooklm-connect`; syntax/build/check pass |

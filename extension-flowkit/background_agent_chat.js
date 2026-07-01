@@ -16,6 +16,8 @@ const DEFAULT_AGENT_SETTINGS = {
   enableSearch: true,
   enableVectorMemory: true,
   codexBridgeUrl: 'http://127.0.0.1:8100/api/codex/run',
+  notebookBridgeUrl: 'http://127.0.0.1:18931',
+  notebookRequestTimeoutMs: 900000,
 };
 
 function agentLocalApiBase() {
@@ -29,6 +31,13 @@ const PACKAGED_AGENT_SKILLS = [
     file: 'skills/fk-runtime-status.md',
     summary: 'Kiểm tra trạng thái runtime, token, queue/log và lỗi gần nhất.',
     handler: 'fk_runtime_status',
+  },
+  {
+    name: 'fk-notebooklm-connect',
+    command: '/fk-notebooklm-connect',
+    file: 'skills/fk-notebooklm-connect.md',
+    summary: 'Chẩn đoán kết nối NotebookLM bridge, auth, notebook target và session capacity.',
+    handler: 'fk_notebook_doctor',
   },
   {
     name: 'fk-runtime-start-stop',
@@ -104,6 +113,74 @@ const AGENT_TOOLS = [
       parameters: {
         type: 'object',
         properties: {},
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'fk_notebook_status',
+      description: 'Check the local NotebookLM desktop bridge status and health without exposing tokens.',
+      parameters: {
+        type: 'object',
+        properties: {},
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'fk_notebook_doctor',
+      description: 'Run NotebookLM bridge diagnostics for auth, selected notebook, session capacity and recent logs.',
+      parameters: {
+        type: 'object',
+        properties: {
+          include_logs: { type: 'boolean' },
+          log_query: { type: 'string' },
+          log_limit: { type: 'number', minimum: 1, maximum: 50 },
+        },
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'fk_notebook_ask_safe',
+      description: 'Ask NotebookLM through the local bridge using preflight diagnostics, classified failures and one safe retry.',
+      parameters: {
+        type: 'object',
+        properties: {
+          question: { type: 'string', minLength: 1 },
+          notebook_id: { type: 'string' },
+          notebook_url: { type: 'string' },
+          session_id: { type: 'string' },
+          source_format: { type: 'string', enum: ['none', 'inline', 'footnotes', 'json'] },
+          show_browser: { type: 'boolean' },
+          retry: { type: 'boolean' },
+        },
+        required: ['question'],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'fk_notebook_add_source',
+      description: 'Add a URL or text source to NotebookLM through the local bridge after connection preflight.',
+      parameters: {
+        type: 'object',
+        properties: {
+          type: { type: 'string', enum: ['url', 'text'] },
+          content: { type: 'string', minLength: 1 },
+          title: { type: 'string' },
+          notebook_id: { type: 'string' },
+          notebook_url: { type: 'string' },
+        },
+        required: ['type', 'content'],
         additionalProperties: false,
       },
     },
@@ -298,7 +375,15 @@ function agentNormalizeBaseUrl(baseUrl) {
 
 function agentSafeError(error) {
   const message = error?.message || String(error || 'Unknown error');
-  return message.replace(/Bearer\s+[A-Za-z0-9._\-]+/g, 'Bearer [redacted]');
+  return redactAgentSecrets(message);
+}
+
+function redactAgentSecrets(value) {
+  return String(value || '')
+    .replace(/Bearer\s+[A-Za-z0-9._\-]+/g, 'Bearer [redacted]')
+    .replace(/ya29\.[A-Za-z0-9._\-]+/g, 'ya29.[redacted]')
+    .replace(/(__Secure-next-auth\.session-token=)[^;\s]+/g, '$1[redacted]')
+    .replace(/(__Host-next-auth\.csrf-token=)[^;\s]+/g, '$1[redacted]');
 }
 
 async function getAgentSettings() {
@@ -315,6 +400,88 @@ async function saveAgentSettings(nextSettings) {
   const safe = { ...DEFAULT_AGENT_SETTINGS, ...current, ...patch };
   await chrome.storage.local.set({ [AGENT_SETTINGS_KEY]: safe });
   return { ...safe, apiKey: safe.apiKey ? '[configured]' : '' };
+}
+
+function agentNormalizeLocalHttpUrl(value, fallback) {
+  const raw = String(value || fallback || '').trim().replace(/\/+$/, '');
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase();
+    const local = host === '127.0.0.1' || host === 'localhost' || host === '::1';
+    if (url.protocol === 'http:' && local) return url.toString().replace(/\/+$/, '');
+  } catch {
+    // Fall through to the fallback.
+  }
+  return String(fallback || DEFAULT_AGENT_SETTINGS.notebookBridgeUrl).replace(/\/+$/, '');
+}
+
+function agentNotebookBridgeBase(settings) {
+  return agentNormalizeLocalHttpUrl(settings.notebookBridgeUrl, DEFAULT_AGENT_SETTINGS.notebookBridgeUrl);
+}
+
+function agentNotebookTimeout(settings, floorMs = 15000) {
+  const value = Number(settings.notebookRequestTimeoutMs || DEFAULT_AGENT_SETTINGS.notebookRequestTimeoutMs);
+  if (!Number.isFinite(value)) return DEFAULT_AGENT_SETTINGS.notebookRequestTimeoutMs;
+  return Math.max(floorMs, Math.min(Math.round(value), 1200000));
+}
+
+async function agentFetchJson(url, {
+  method = 'GET',
+  body,
+  timeoutMs = 30000,
+  retries = 1,
+} = {}) {
+  let lastError = null;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const resp = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: method === 'POST' ? JSON.stringify(body || {}) : undefined,
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      const text = await resp.text();
+      let data;
+      try { data = JSON.parse(text || '{}'); } catch { data = { text: redactAgentSecrets(text) }; }
+      data = redactNotebookPayload(data);
+      if (!resp.ok) {
+        lastError = new Error(data.error || data.message || `HTTP ${resp.status}`);
+        if (resp.status >= 500 && attempt < retries) {
+          await sleep(350 * (attempt + 1));
+          continue;
+        }
+        return { ok: false, status: resp.status, error: agentSafeError(lastError), result: data };
+      }
+      return { ok: true, status: resp.status, result: data };
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) {
+        await sleep(350 * (attempt + 1));
+        continue;
+      }
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  return { ok: false, status: 0, error: agentSafeError(lastError || 'Request failed') };
+}
+
+function redactNotebookPayload(value) {
+  if (typeof value === 'string') return redactAgentSecrets(value);
+  if (Array.isArray(value)) return value.map((item) => redactNotebookPayload(item));
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  Object.entries(value).forEach(([key, item]) => {
+    if (/token|cookie|authorization|api[-_]?key|secret/i.test(key)) {
+      out[key] = item ? '[redacted]' : item;
+      return;
+    }
+    out[key] = redactNotebookPayload(item);
+  });
+  return out;
 }
 
 function agentHeaders(settings) {
@@ -485,6 +652,8 @@ function buildAgentSystemPrompt({ skillMarkdown, skillSummary, memorySnippets })
     'Dùng tool hẹp nhất và an toàn nhất. Validate dữ liệu trước khi gọi tool.',
     'Không bịa tool result. Luôn đọc tool result trước khi kết luận.',
     'Nếu cần thông tin hiện tại và search được bật, dùng fk_agent_search.',
+    'Khi user yêu cầu NotebookLM/NotebookML, kiểm tra kết nối bằng fk_notebook_doctor hoặc fk_notebook_status trước; dùng fk_notebook_ask_safe thay vì gọi ask thường.',
+    'Không hiển thị token/cookie/secret từ NotebookLM bridge, kể cả khi tool trả về log.',
     'Nếu user yêu cầu sửa bug/retry bằng Codex, dùng fk_codex_prompt và báo rõ cần local Codex bridge đang chạy.',
     'Nếu chưa có skill phù hợp, có thể tạo skill bằng fk_create_skill rồi giải thích cách dùng command đó.',
     'Trả lời ngắn gọn theo ngôn ngữ của user.',
@@ -513,6 +682,91 @@ async function executeAgentTool(name, args, settings) {
         lastError: metrics.lastError || null,
       },
       requestLogCount: requestLog.length,
+      notebookBridgeUrl: agentNotebookBridgeBase(settings),
+    };
+  }
+
+  if (name === 'fk_notebook_status') {
+    const base = agentNotebookBridgeBase(settings);
+    const [info, health] = await Promise.all([
+      agentFetchJson(`${base}/api/info`, { timeoutMs: 10000, retries: 1 }),
+      agentFetchJson(`${base}/api/health`, { timeoutMs: 15000, retries: 1 }),
+    ]);
+    return {
+      ok: info.ok && health.ok,
+      bridgeUrl: base,
+      info,
+      health,
+      tokenPresentInExtension: !!flowKey,
+      extensionTokenAgeMs: metrics.tokenCapturedAt ? Date.now() - metrics.tokenCapturedAt : null,
+    };
+  }
+
+  if (name === 'fk_notebook_doctor') {
+    const base = agentNotebookBridgeBase(settings);
+    const body = {
+      include_logs: Boolean(input.include_logs),
+      log_query: input.log_query || '',
+      log_limit: Math.max(1, Math.min(Number(input.log_limit || 12), 50)),
+    };
+    const result = await agentFetchJson(`${base}/api/doctor`, {
+      method: 'POST',
+      body,
+      timeoutMs: 30000,
+      retries: 1,
+    });
+    return {
+      ok: result.ok && result.result?.ok !== false,
+      bridgeUrl: base,
+      result,
+      tokenPresentInExtension: !!flowKey,
+      extensionTokenAgeMs: metrics.tokenCapturedAt ? Date.now() - metrics.tokenCapturedAt : null,
+      nextStep: result.ok && result.result?.ok
+        ? 'NotebookLM bridge is ready for ask-safe/add-source.'
+        : 'Run MCP auth in the desktop bridge, select/pass a notebook, or start the bridge if unreachable.',
+    };
+  }
+
+  if (name === 'fk_notebook_ask_safe') {
+    const base = agentNotebookBridgeBase(settings);
+    const result = await agentFetchJson(`${base}/api/ask-safe`, {
+      method: 'POST',
+      body: {
+        ...input,
+        retry: input.retry !== false,
+        show_browser: input.show_browser !== false,
+      },
+      timeoutMs: agentNotebookTimeout(settings),
+      retries: 0,
+    });
+    return {
+      ok: result.ok && result.result?.ok !== false,
+      bridgeUrl: base,
+      result,
+    };
+  }
+
+  if (name === 'fk_notebook_add_source') {
+    const base = agentNotebookBridgeBase(settings);
+    const preflight = await executeAgentTool('fk_notebook_doctor', {}, settings);
+    if (!preflight.ok) {
+      return {
+        ok: false,
+        error: 'NotebookLM preflight failed; source was not submitted.',
+        preflight,
+      };
+    }
+    const result = await agentFetchJson(`${base}/api/sources`, {
+      method: 'POST',
+      body: input,
+      timeoutMs: agentNotebookTimeout(settings),
+      retries: 0,
+    });
+    return {
+      ok: result.ok && result.result?.ok !== false,
+      bridgeUrl: base,
+      preflight,
+      result,
     };
   }
 
@@ -572,6 +826,8 @@ async function executeAgentTool(name, args, settings) {
       enableSearch: Boolean(settings.enableSearch),
       enableVectorMemory: Boolean(settings.enableVectorMemory),
       codexBridgeUrl: settings.codexBridgeUrl,
+      notebookBridgeUrl: agentNotebookBridgeBase(settings),
+      notebookRequestTimeoutMs: agentNotebookTimeout(settings),
     };
   }
 
@@ -684,6 +940,11 @@ async function runDeterministicCommand(command, userText, settings) {
     args = { action: lower.includes('clear') ? 'clear' : 'read', limit: 10 };
   } else if (command.handler === 'fk_chat_send') {
     args = { message: userText.replace(/^\/[\w-]+\s*/, '').trim() || userText };
+  } else if (command.handler === 'fk_notebook_doctor') {
+    args = {
+      include_logs: lower.includes('log') || lower.includes('diagnose') || lower.includes('doctor'),
+      log_limit: 12,
+    };
   } else if (command.handler === 'fk_bridge_request') {
     return null;
   }
@@ -865,6 +1126,11 @@ async function testAgentConnection(settingsPatch = {}) {
   return { ok: true, models, configuredModel: settings.model };
 }
 
+async function testNotebookConnection(settingsPatch = {}) {
+  const settings = { ...(await getAgentSettings()), ...(settingsPatch || {}) };
+  return executeAgentTool('fk_notebook_doctor', { include_logs: false, log_limit: 8 }, settings);
+}
+
 chrome.runtime.onMessage.addListener((msg, _, reply) => {
   if (msg.type === 'AGENT_CHAT_RUN') {
     runAgentChat(msg.payload || {})
@@ -889,6 +1155,13 @@ chrome.runtime.onMessage.addListener((msg, _, reply) => {
 
   if (msg.type === 'AGENT_CONNECTION_TEST') {
     testAgentConnection(msg.settings || {})
+      .then((result) => reply(result))
+      .catch((error) => reply({ ok: false, error: agentSafeError(error) }));
+    return true;
+  }
+
+  if (msg.type === 'AGENT_NOTEBOOK_TEST') {
+    testNotebookConnection(msg.settings || {})
       .then((result) => reply(result))
       .catch((error) => reply({ ok: false, error: agentSafeError(error) }));
     return true;

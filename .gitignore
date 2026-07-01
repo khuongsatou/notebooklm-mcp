@@ -50,3 +50,7 @@ venv/
 tmp/
 studio-*.png
 release/
+
+# Local scratch and reference clones
+curl/session.txt
+refer/notebooklm-py/

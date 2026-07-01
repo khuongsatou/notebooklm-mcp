@@ -329,6 +329,7 @@ export function applyBrowserOptions(options?: BrowserOptions, legacyShowBrowser?
     }
     if (options.timeout_ms !== undefined) {
       config.browserTimeout = options.timeout_ms;
+      config.answerTimeoutMs = options.timeout_ms;
     }
     if (options.stealth) {
       const s = options.stealth;

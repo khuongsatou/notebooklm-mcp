@@ -63,3 +63,22 @@ npm run smoke:desktop
 ## Defects
 
 - None blocking found in syntax/build/backend smoke tests.
+
+## QA Update - 2026-07-01 Extension NotebookLM Stable Connection
+
+| Requirement | Test | Result | Evidence |
+|-------------|------|--------|----------|
+| REQ-008 | Extension Agent Chat background syntax | Pass | `node --check extension-flowkit/background_agent_chat.js` |
+| REQ-008 | Extension Agent Chat UI syntax | Pass | `node --check extension-flowkit/side_panel_agent_chat.js` |
+| REQ-008 | Extension side panel related syntax | Pass | `node --check extension-flowkit/background.js`, `side_panel_chat.js`, `side_panel.js`, `side_panel_skills.js` |
+| REQ-008 | TypeScript MCP build after integration | Pass | `npm run build` |
+| REQ-008 | Desktop bridge syntax including safe runner | Pass | `npm run check:desktop` |
+| REQ-008 | Desktop bridge smoke baseline for extension target | Pass with manual skips | `npm run smoke:desktop` returned 17 pass, 6 skipped/manual |
+
+### Manual Test Still Needed
+
+- Load/reload `extension-flowkit` in Chrome.
+- Open Agent Chat settings, verify `NotebookLM Bridge` defaults to `http://127.0.0.1:18931`.
+- Start desktop bridge, click `Test NotebookLM`, confirm doctor shows ready/warning/blocker accurately.
+- Use `/fk-notebooklm-connect` and ask a real notebook question through `fk_notebook_ask_safe`.
+- Add a small text source through `fk_notebook_add_source` against a known notebook.

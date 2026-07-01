@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T04:57:00.388Z",
+  "generatedAt": "2026-07-01T09:10:14.853Z",
   "counts": {
     "PASS": 17,
     "SKIP": 6
@@ -10,13 +10,13 @@
       "status": "PASS",
       "ms": 2,
       "details": {
-        "url": "http://127.0.0.1:50543"
+        "url": "http://127.0.0.1:56469"
       }
     },
     {
       "name": "api.info",
       "status": "PASS",
-      "ms": 18,
+      "ms": 8,
       "details": {
         "version": "2.0.0"
       }
@@ -24,7 +24,7 @@
     {
       "name": "settings.get",
       "status": "PASS",
-      "ms": 4,
+      "ms": 1,
       "details": {
         "hasProviderApiKey": false
       }
@@ -41,7 +41,7 @@
     {
       "name": "logs.write/list/clear",
       "status": "PASS",
-      "ms": 4,
+      "ms": 2,
       "details": {
         "cleared": true
       }
@@ -57,7 +57,7 @@
     {
       "name": "mcp.health",
       "status": "PASS",
-      "ms": 371,
+      "ms": 369,
       "details": {
         "authenticated": false,
         "sessions": 0
@@ -66,7 +66,7 @@
     {
       "name": "mcp.tools",
       "status": "PASS",
-      "ms": 4,
+      "ms": 2,
       "details": {
         "count": 20
       }
@@ -76,7 +76,7 @@
       "status": "PASS",
       "ms": 3,
       "details": {
-        "count": 0
+        "count": 1
       }
     },
     {
@@ -105,9 +105,9 @@
     {
       "name": "content.questions.list_read",
       "status": "PASS",
-      "ms": 12,
+      "ms": 11,
       "details": {
-        "count": 33,
+        "count": 35,
         "sample": "không nên làm/Deep dive 01 - Không nên làm - Tư duy đạo diễn AI.json",
         "bytes": 1000
       }
@@ -125,7 +125,7 @@
     {
       "name": "updates.check.no_repo",
       "status": "PASS",
-      "ms": 1,
+      "ms": 0,
       "details": {
         "message": "No update repo configured."
       }
@@ -133,15 +133,15 @@
     {
       "name": "agent.config",
       "status": "PASS",
-      "ms": 0,
+      "ms": 1,
       "details": {
-        "toolCount": 11
+        "toolCount": 13
       }
     },
     {
       "name": "agent.provider_test_expected_fail",
       "status": "PASS",
-      "ms": 13,
+      "ms": 12,
       "details": {
         "handledError": "fetch failed"
       }
@@ -149,7 +149,7 @@
     {
       "name": "package.artifact",
       "status": "PASS",
-      "ms": 1,
+      "ms": 0,
       "details": {
         "artifact": "NotebookLM-MCP-Desktop-2.0.0-darwin-arm64"
       }

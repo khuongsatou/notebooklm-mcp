@@ -109,6 +109,8 @@ function registerIpc() {
   ipcMain.handle('notebook:reauth', (_event, payload) => bridgeRequest('/api/auth/reauth', 'POST', payload || {}));
   ipcMain.handle('notebook:open-system-profile', (_event, payload) => bridgeRequest('/api/auth/open-system-profile', 'POST', payload || {}));
   ipcMain.handle('notebook:ask', (_event, payload) => bridgeRequest('/api/ask', 'POST', payload || {}));
+  ipcMain.handle('notebook:ask-safe', (_event, payload) => bridgeRequest('/api/ask-safe', 'POST', payload || {}));
+  ipcMain.handle('notebook:doctor', (_event, payload) => bridgeRequest('/api/doctor', 'POST', payload || {}));
   ipcMain.handle('notebook:add-source', (_event, payload) => bridgeRequest('/api/sources', 'POST', payload || {}));
   ipcMain.handle('notebook:audio-generate', (_event, payload) => bridgeRequest('/api/audio/generate', 'POST', payload || {}));
   ipcMain.handle('notebook:audio-status', (_event, payload) => bridgeRequest('/api/audio/status', 'POST', payload || {}));

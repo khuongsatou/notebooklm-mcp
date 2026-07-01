@@ -43,3 +43,38 @@ Implemented the Electron desktop app and backend bridge planned in `.manager/des
 - `npm run package` creates a local current-platform app bundle in `release/`.
 - Signed/notarized installer and production auto-update install flow remain future release hardening.
 - Manual QA remains required for Google login, real NotebookLM ask/source/audio, real LLM Agent Chat and visual UI parity.
+
+## Progress Update - 2026-07-01
+
+### Current Status
+
+- Project status remains In Progress, not ready to close.
+- Desktop Electron + NotebookLM bridge foundation is implemented.
+- New safe execution layer is present locally: doctor diagnostics, safe ask preflight, classified failure output, one safe retry path, Agent Chat tool exposure, IPC/preload exposure, and renderer integration.
+
+### Verification
+
+- `npm run build`: Pass.
+- `npm run check:desktop`: Pass.
+
+### Remaining Work
+
+- Confirm pending NotebookLM source ingestion for the YouTube URL and transcript text.
+- Run a real authenticated `ask_question` or `ask-safe` against the target notebook and validate NotebookLM Gemini answer quality.
+- Run manual Electron UI review.
+- Resolve release/security hygiene before commit or handoff.
+
+### Risks And Blockers
+
+- `curl/session.txt` contains sensitive cookie/session/access token material and is currently untracked. It must be removed or ignored before commit, and tokens should be rotated if exposed.
+- `.manager/current_task.md` tracks a NotebookLM YouTube ingestion task, while older requirements/final report sections still describe the broader Agent Chat/Electron desktop build. PM needs to reconcile scope before marking Done.
+- Signing/notarization, production installer, and auto-update install remain future hardening.
+
+## Extension NotebookLM Connection Update - 2026-07-01
+
+- Implemented stable NotebookLM bridge controls in extension Agent Chat.
+- New user-facing controls: `NotebookLM Bridge`, `Notebook Timeout`, `Test NotebookLM`.
+- New tools: `fk_notebook_status`, `fk_notebook_doctor`, `fk_notebook_ask_safe`, `fk_notebook_add_source`.
+- New skill: `/fk-notebooklm-connect`.
+- Verification: extension JS syntax checks passed, `npm run build` passed, `npm run check:desktop` passed.
+- Release note: requires local desktop NotebookLM bridge running, default `http://127.0.0.1:18931`; real auth/notebook testing remains manual.

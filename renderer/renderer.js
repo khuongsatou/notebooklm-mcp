@@ -466,9 +466,14 @@ async function askQuestion() {
   setBusy('quickAskBtn', true);
   $('answerBox').textContent = 'Asking NotebookLM...';
   try {
-    const res = await api.notebook.ask(payload);
-    if (res.ok === false) throw new Error(res.error || 'Ask failed');
-    const answer = res.data?.answer || res.answer || pretty(res);
+    const res = api.notebook.askSafe
+      ? await api.notebook.askSafe({ ...payload, retry: true })
+      : await api.notebook.ask(payload);
+    if (res.ok === false) {
+      $('answerBox').textContent = pretty(res);
+      throw new Error(res.error || 'Ask failed');
+    }
+    const answer = res.data?.answer || res.result?.data?.answer || res.answer || pretty(res);
     state.latestAnswer = answer;
     $('answerBox').textContent = answer;
   } catch (error) {

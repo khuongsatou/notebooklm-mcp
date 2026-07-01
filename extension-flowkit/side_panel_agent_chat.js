@@ -14,6 +14,8 @@ const DEFAULT_AGENT_UI_SETTINGS = {
   enableSearch: true,
   enableVectorMemory: true,
   codexBridgeUrl: 'http://127.0.0.1:8100/api/codex/run',
+  notebookBridgeUrl: 'http://127.0.0.1:18931',
+  notebookRequestTimeoutMs: 900000,
 };
 
 let agentOpen = false;
@@ -127,12 +129,15 @@ function agentCreateShell() {
         <label>Max Loops<input id="agent-max-loops" type="number" min="1" max="12"></label>
         <label>Tool Calls/Loop<input id="agent-max-tool-calls" type="number" min="1" max="8"></label>
         <label>Codex Bridge URL<input id="agent-codex-url" type="url" placeholder="http://127.0.0.1:8100/api/codex/run"></label>
+        <label>NotebookLM Bridge<input id="agent-notebook-url" type="url" placeholder="http://127.0.0.1:18931"></label>
+        <label>Notebook Timeout<input id="agent-notebook-timeout" type="number" min="15000" max="1200000" step="5000"></label>
         <label class="agent-check"><input id="agent-enable-search" type="checkbox"> Agent Search</label>
         <label class="agent-check"><input id="agent-enable-memory" type="checkbox"> Vector Memory</label>
       </div>
       <div class="agent-settings-actions">
         <button class="btn" id="agent-save-settings" type="button">Save</button>
         <button class="btn" id="agent-test-connection" type="button">Test connection</button>
+        <button class="btn" id="agent-test-notebook" type="button">Test NotebookLM</button>
       </div>
       <div class="agent-status-line" id="agent-settings-status"></div>
     </div>
@@ -163,6 +168,7 @@ function agentCreateShell() {
   document.getElementById('agent-new-session').addEventListener('click', newAgentSession);
   document.getElementById('agent-save-settings').addEventListener('click', saveAgentSettingsFromUi);
   document.getElementById('agent-test-connection').addEventListener('click', testAgentConnectionFromUi);
+  document.getElementById('agent-test-notebook').addEventListener('click', testNotebookConnectionFromUi);
   document.getElementById('agent-create-skill').addEventListener('click', createAgentSkillFromUi);
   document.querySelectorAll('.agent-tab').forEach((btn) => {
     btn.addEventListener('click', () => setAgentTab(btn.dataset.agentTab));
@@ -335,6 +341,8 @@ function hydrateAgentSettingsUi() {
     'agent-max-loops': agentSettings.maxLoops,
     'agent-max-tool-calls': agentSettings.maxToolCallsPerLoop,
     'agent-codex-url': agentSettings.codexBridgeUrl,
+    'agent-notebook-url': agentSettings.notebookBridgeUrl,
+    'agent-notebook-timeout': agentSettings.notebookRequestTimeoutMs,
   };
   Object.entries(fields).forEach(([id, value]) => {
     const el = document.getElementById(id);
@@ -361,6 +369,8 @@ function collectAgentSettingsFromUi() {
     maxLoops: Number(document.getElementById('agent-max-loops')?.value || DEFAULT_AGENT_UI_SETTINGS.maxLoops),
     maxToolCallsPerLoop: Number(document.getElementById('agent-max-tool-calls')?.value || DEFAULT_AGENT_UI_SETTINGS.maxToolCallsPerLoop),
     codexBridgeUrl: document.getElementById('agent-codex-url')?.value || DEFAULT_AGENT_UI_SETTINGS.codexBridgeUrl,
+    notebookBridgeUrl: document.getElementById('agent-notebook-url')?.value || DEFAULT_AGENT_UI_SETTINGS.notebookBridgeUrl,
+    notebookRequestTimeoutMs: Number(document.getElementById('agent-notebook-timeout')?.value || DEFAULT_AGENT_UI_SETTINGS.notebookRequestTimeoutMs),
     enableSearch: Boolean(document.getElementById('agent-enable-search')?.checked),
     enableVectorMemory: Boolean(document.getElementById('agent-enable-memory')?.checked),
   };
@@ -393,6 +403,28 @@ async function testAgentConnectionFromUi() {
     setAgentStatus(`Connected. ${resp.models?.length || 0} model(s).`, 'ok');
   } else {
     setAgentStatus(`Test failed: ${resp.error}`, 'bad');
+  }
+}
+
+async function testNotebookConnectionFromUi() {
+  const btn = document.getElementById('agent-test-notebook');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Testing...';
+  }
+  setAgentStatus('Running NotebookLM doctor...', '');
+  const resp = await agentSendMessage('AGENT_NOTEBOOK_TEST', { settings: collectAgentSettingsFromUi() });
+  const doctor = resp.result?.result || resp.result || null;
+  if (resp.ok || doctor) {
+    const status = doctor?.status || (resp.ok ? 'ready' : 'blocked');
+    const summary = doctor?.summary || resp.error || 'NotebookLM bridge responded.';
+    setAgentStatus(`NotebookLM ${status}: ${summary}`, resp.ok && status === 'ready' ? 'ok' : '');
+  } else {
+    setAgentStatus(`NotebookLM test failed: ${resp.error || resp.result?.error || 'Bridge unavailable'}`, 'bad');
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = 'Test NotebookLM';
   }
 }
 

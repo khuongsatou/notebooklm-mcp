@@ -39,3 +39,31 @@
 - Packaging creates a local app bundle, but signing/notarization and auto-update install are not implemented.
 - Actual NotebookLM login/ask/audio require user auth and browser review.
 - `npm install` reported npm audit vulnerabilities in dependency tree and EBADENGINE warnings from ESLint packages under Node v23.4.0.
+
+## Update - 2026-07-01 Extension NotebookLM Stable Connection
+
+### Developer Summary
+
+Đã bổ sung lớp kết nối NotebookLM ổn định từ Chrome extension Agent Chat sang local NotebookLM desktop bridge.
+
+### Changed Files
+
+| File | Requirement | Notes |
+|------|-------------|-------|
+| `extension-flowkit/background_agent_chat.js` | REQ-008 | Thêm settings `notebookBridgeUrl`, `notebookRequestTimeoutMs`; thêm tools `fk_notebook_status`, `fk_notebook_doctor`, `fk_notebook_ask_safe`, `fk_notebook_add_source`; thêm fetch helper có timeout/retry và redaction token/cookie. |
+| `extension-flowkit/side_panel_agent_chat.js` | REQ-008 | Thêm fields NotebookLM Bridge/Timeout và nút `Test NotebookLM` trong Agent settings. |
+| `extension-flowkit/skills/fk-notebooklm-connect.md` | REQ-008 | Skill workflow cho chẩn đoán bridge/auth/notebook/session và dùng ask-safe/add-source an toàn. |
+| `extension-flowkit/side_panel_chat.js` | REQ-008 | Thêm fallback command `/fk-notebooklm-connect` cho autocomplete khi backend skills API chưa chạy. |
+
+### Technical Decisions
+
+- Extension chỉ gọi HTTP local `http://127.0.0.1`/`localhost` để tránh biến Agent Chat thành proxy tuỳ ý.
+- Ask dùng `/api/ask-safe` thay vì `/api/ask`, có preflight doctor, classified failure và retry ở desktop bridge.
+- Add source chạy preflight `fk_notebook_doctor` trước khi submit `/api/sources`.
+- Tool results được redact token/cookie/authorization trước khi đưa vào Agent Chat.
+
+### Remaining Risks
+
+- Cần desktop NotebookLM bridge đang chạy ở URL cấu hình, mặc định `http://127.0.0.1:18931`.
+- Cần MCP auth và notebook target hợp lệ trước khi ask/add-source thật.
+- Chưa chạy manual Chrome extension UI review trong trình duyệt.

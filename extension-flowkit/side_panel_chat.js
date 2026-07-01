@@ -22,6 +22,7 @@ const FALLBACK_SKILLS = [
   "fk-gen-images","fk-gen-music","fk-gen-narrator","fk-gen-refs",
   "fk-gen-text-overlays","fk-gen-tts-template","fk-gen-videos",
   "fk-import-voice","fk-insert-scene","fk-monitor","fk-pipeline",
+  "fk-notebooklm-connect",
   "fk-refresh-urls","fk-research","fk-review-board","fk-review-video",
   "fk-status","fk-switch-project","fk-thumbnail","fk-thumbnail-guide",
   "fk-upload-image","fk-youtube-seo","fk-youtube-upload",
